@@ -13,7 +13,6 @@ schema_view = get_schema_view(
     title="B2B Django Bulletin Board API",
     default_version='v1',
     description="API documentation for the B2B Django Bulletin Board system",
-    contact=openapi.Contact(email="contact@example.com"),
     ),
     
     public=True,

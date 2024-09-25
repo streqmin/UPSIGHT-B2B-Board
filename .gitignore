@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django
+*.env
+db.sqlite3
+db.sqlite3-journal
+/static/
+/media/
+/staticfiles/
+
+# Virtual environment
+venv/
+env/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.iml
+
+# Logs and temp files
+*.log
+logs/
+*.tmp
+*.swp
+
+# Docker (if applicable)
+*.log
+*.pid
+
+# Node.js (if applicable)
+node_modules/
