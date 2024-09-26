@@ -1,5 +1,3 @@
-# boards/views.py
-
 from rest_framework import generics, viewsets, permissions, filters, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -23,12 +21,12 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = (permissions.AllowAny,)
     serializer_class = RegisterSerializer
 
-    def create(self, request, *args, **kwargs):
-        """
-        사용자 등록 시 추가적인 로직이 필요하다면 여기에 작성.
-        현재는 기본적인 생성 로직을 사용합니다.
-        """
-        return super().create(request, *args, **kwargs)
+    # def create(self, request, *args, **kwargs):
+    #     """
+    #     사용자 등록 시 추가적인 로직이 필요하다면 여기에 작성.
+    #     현재는 기본적인 생성 로직을 사용합니다.
+    #     """
+    #     return super().create(request, *args, **kwargs)
 
 # 비즈니스 관리용 뷰셋
 class BusinessViewSet(viewsets.ModelViewSet):
@@ -44,24 +42,24 @@ class BusinessViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'address', 'phone_number', 'website']
     ordering_fields = ['name']
 
-    def create(self, request, *args, **kwargs):
-        """
-        비즈니스 생성 시 추가적인 로직이 필요하다면 여기에 작성.
-        예: 현재 관리자가 소속된 비즈니스만 생성할 수 있도록 제한.
-        """
-        return super().create(request, *args, **kwargs)
+    # def create(self, request, *args, **kwargs):
+    #     """
+    #     비즈니스 생성 시 추가적인 로직이 필요하다면 여기에 작성.
+    #     예: 현재 관리자가 소속된 비즈니스만 생성할 수 있도록 제한.
+    #     """
+    #     return super().create(request, *args, **kwargs)
 
-    def update(self, request, *args, **kwargs):
-        """
-        비즈니스 수정 시 추가적인 로직이 필요하다면 여기에 작성.
-        """
-        return super().update(request, *args, **kwargs)
+    # def update(self, request, *args, **kwargs):
+    #     """
+    #     비즈니스 수정 시 추가적인 로직이 필요하다면 여기에 작성.
+    #     """
+    #     return super().update(request, *args, **kwargs)
 
-    def destroy(self, request, *args, **kwargs):
-        """
-        비즈니스 삭제 시 추가적인 로직이 필요하다면 여기에 작성.
-        """
-        return super().destroy(request, *args, **kwargs)
+    # def destroy(self, request, *args, **kwargs):
+    #     """
+    #     비즈니스 삭제 시 추가적인 로직이 필요하다면 여기에 작성.
+    #     """
+    #     return super().destroy(request, *args, **kwargs)
 
 # 게시글 관리용 뷰셋
 class PostViewSet(viewsets.ModelViewSet):
@@ -93,11 +91,11 @@ class PostViewSet(viewsets.ModelViewSet):
         """
         serializer.save(author=self.request.user, business=self.request.user.business)
 
-    def perform_update(self, serializer):
-        """
-        게시글 업데이트 시 추가적인 로직이 필요하다면 여기에 작성.
-        """
-        serializer.save()
+    # def perform_update(self, serializer):
+    #     """
+    #     게시글 업데이트 시 추가적인 로직이 필요하다면 여기에 작성.
+    #     """
+    #     serializer.save()
 
     def perform_destroy(self, instance):
         """
@@ -151,11 +149,11 @@ class CommentViewSet(viewsets.ModelViewSet):
         """
         serializer.save(author=self.request.user)
 
-    def perform_update(self, serializer):
-        """
-        댓글 업데이트 시 추가적인 로직이 필요하다면 여기에 작성.
-        """
-        serializer.save()
+    # def perform_update(self, serializer):
+    #     """
+    #     댓글 업데이트 시 추가적인 로직이 필요하다면 여기에 작성.
+    #     """
+    #     serializer.save()
 
     def perform_destroy(self, instance):
         """
