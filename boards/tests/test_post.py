@@ -101,16 +101,16 @@ def test_order_posts_by_created_at_desc(authenticated_client, user):
     assert response.data['results'][1]['id'] == post1.id
 
 @pytest.mark.django_db
-def test_pagination_posts(authenticated_client, post_factory):
+def test_pagination_posts(authenticated_client, user):
     """
     게시글 페이지네이션 테스트
     """
-    for _ in range(15):
-        post_factory(author=authenticated_client.force_authenticate.user)
-    url = reverse('post-list') + '?page=1&limit=10'  # 페이지네이션 파라미터에 맞게 수정
+    for _ in range(20):
+        PostFactory(author=user)
+    url = reverse('post-list') + '?page=1&limit=20'  # 페이지네이션 파라미터에 맞게 수정
     response = authenticated_client.get(url, format='json')
     assert response.status_code == status.HTTP_200_OK
-    assert len(response.data['results']) == 10
+    assert len(response.data['results']) == 20
     assert 'next' in response.data
     assert 'previous' in response.data
 
@@ -136,12 +136,11 @@ def test_update_post_non_owner(non_owner_authenticated_client, post):
     """
     게시글 수정 시도 (비소유자 사용자)
     """
-    # url = reverse('post-detail', args=[post.id])
-    url = reverse('post-detail', kwargs={'pk': post.pk})
+    url = reverse('post-detail', args=[post.id])
+    # url = reverse('post-detail', kwargs={'pk': post.pk})
     data = {
         'title': 'Hacked Title',
-        'content': 'Hacked content.',
-        'is_public': True
+        'content': 'Hacked content.'
     }
     response = non_owner_authenticated_client.put(url, data, format='json')
     assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -171,15 +170,14 @@ def test_delete_post_non_owner(non_owner_authenticated_client, post):
     assert post.is_deleted == False
 
 @pytest.mark.django_db
-def test_my_posts(authenticated_client, post_factory, user):
+def test_my_posts(authenticated_client, user):
     """
     'my_posts' 커스텀 액션 테스트
     """
-    client = authenticated_client
-    post1 = post_factory(author=user)
-    post2 = post_factory(author=user)
-    url = reverse('post-my_posts')  # routers.py에서 action에 대한 name이 'post-my-posts'라고 가정
-    response = client.get(url, format='json')
+    post1 = PostFactory(author=user)
+    post2 = PostFactory(author=user)
+    url = reverse('post-my-posts')  # views의 메소드 이름은 my_posts 이지만, reverse 에서는 '_' -> '-'
+    response = authenticated_client.get(url, format='json')
     assert response.status_code == status.HTTP_200_OK
     assert len(response.data['results']) >= 2
     assert any(p['id'] == post1.id for p in response.data['results'])

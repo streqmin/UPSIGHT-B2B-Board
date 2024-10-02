@@ -42,25 +42,6 @@ class BusinessViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'address', 'phone_number', 'website']
     ordering_fields = ['name']
 
-    # def create(self, request, *args, **kwargs):
-    #     """
-    #     비즈니스 생성 시 추가적인 로직이 필요하다면 여기에 작성.
-    #     예: 현재 관리자가 소속된 비즈니스만 생성할 수 있도록 제한.
-    #     """
-    #     return super().create(request, *args, **kwargs)
-
-    # def update(self, request, *args, **kwargs):
-    #     """
-    #     비즈니스 수정 시 추가적인 로직이 필요하다면 여기에 작성.
-    #     """
-    #     return super().update(request, *args, **kwargs)
-
-    # def destroy(self, request, *args, **kwargs):
-    #     """
-    #     비즈니스 삭제 시 추가적인 로직이 필요하다면 여기에 작성.
-    #     """
-    #     return super().destroy(request, *args, **kwargs)
-
 # 게시글 관리용 뷰셋
 class PostViewSet(viewsets.ModelViewSet):
     """

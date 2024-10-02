@@ -12,10 +12,7 @@ def test_create_business(admin_authenticated_client):
     """
     url = reverse('business-list')  # routers.py에서 BusinessViewSet에 대한 name이 'business-list'라고 가정
     data = {
-        'name': 'Test Business',
-        # 'address': '123 Test St',
-        # 'phone_number': '123-456-7890',
-        # 'website': 'https://www.testbusiness.com'
+        'name': 'Test Business'
     }
     response = admin_authenticated_client.post(url, data, format='json')
     assert response.status_code == status.HTTP_201_CREATED
@@ -45,8 +42,8 @@ def test_list_business(admin_authenticated_client, business):
     url = reverse('business-list')
     response = admin_authenticated_client.get(url, format='json')
     assert response.status_code == status.HTTP_200_OK
-    assert len(response.data) >= 1  # 최소 하나 이상의 비즈니스가 존재
-    assert any(b['id'] == business.id for b in response.data)
+    assert len(response.data['results']) >= 1  # 최소 하나 이상의 비즈니스가 존재
+    assert any(b['id'] == business.id for b in response.data['results'])
 
 @pytest.mark.django_db
 def test_update_business(admin_authenticated_client, business):

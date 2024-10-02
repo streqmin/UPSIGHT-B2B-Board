@@ -22,7 +22,7 @@ def other_user(db, business):
 @pytest.fixture
 def admin_user(db, business):
     """비즈니스 관리자 사용자 인스턴스를 반환하는 Fixture"""
-    return UserFactory(role='BUSINESS_ADMIN', business = business)
+    return UserFactory(role='admin', business = business)
 
 @pytest.fixture
 def business(db):
