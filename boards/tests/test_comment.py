@@ -86,7 +86,8 @@ def test_update_comment_non_owner(non_owner_authenticated_client, comment):
     url = reverse('comment-detail', args=[comment.id])
     data = {
         'content': 'Hacked comment content.',
-        'post': comment.post.id
+        'is_public': True,
+        'is_deleted': False
     }
     response = non_owner_authenticated_client.put(url, data, format='json')
     assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -109,12 +110,12 @@ def test_delete_comment_non_owner(non_owner_authenticated_client, comment):
     """
     댓글 삭제 시도 (비소유자 사용자)
     """
-    client = non_owner_authenticated_client  # 비소유자 클라이언트 사용
+    client = non_owner_authenticated_client
     url = reverse('comment-detail', args=[comment.id])
     response = client.delete(url, format='json')
-    assert response.status_code == status.HTTP_403_FORBIDDEN  # 비소유자는 삭제 권한 없음
+    assert response.status_code == status.HTTP_403_FORBIDDEN
     comment.refresh_from_db()
-    assert comment.is_deleted == False  # 댓글이 삭제되지 않았음을 확인
+    assert comment.is_deleted == False
 
 @pytest.mark.django_db
 def test_my_comments(authenticated_client, user):

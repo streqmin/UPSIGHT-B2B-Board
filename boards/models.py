@@ -5,7 +5,6 @@ from django.contrib.auth.models import AbstractUser
 
 class Business(models.Model):
     name = models.CharField(max_length=255)
-    # 추가 필드가 필요하면 여기에 작성
 
     def __str__(self):
         return self.name

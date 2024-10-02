@@ -13,7 +13,7 @@ def test_create_post(authenticated_client, user):
     """
     게시글 생성 테스트 (일반 사용자)
     """
-    url = reverse('post-list')  # routers.py에서 PostViewSet에 대한 name이 'post-list'라고 가정
+    url = reverse('post-list')
     data = {
         'business': user.business.id,
         'title': 'Test Post',
@@ -80,8 +80,6 @@ def test_order_posts_by_created_at_desc(authenticated_client, user):
     """
     작성일 기준 내림차순 정렬 테스트
     """
-    # post1 = PostFactory(title='First Post', created_at='2023-01-01T00:00:00Z')
-    # post2 = PostFactory(title='Second Post', created_at='2023-02-01T00:00:00Z')
     post1 = PostFactory(
         author=user,
         business=user.business,
@@ -137,7 +135,6 @@ def test_update_post_non_owner(non_owner_authenticated_client, post):
     게시글 수정 시도 (비소유자 사용자)
     """
     url = reverse('post-detail', args=[post.id])
-    # url = reverse('post-detail', kwargs={'pk': post.pk})
     data = {
         'title': 'Hacked Title',
         'content': 'Hacked content.'

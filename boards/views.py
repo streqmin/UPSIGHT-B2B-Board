@@ -21,13 +21,6 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = (permissions.AllowAny,)
     serializer_class = RegisterSerializer
 
-    # def create(self, request, *args, **kwargs):
-    #     """
-    #     사용자 등록 시 추가적인 로직이 필요하다면 여기에 작성.
-    #     현재는 기본적인 생성 로직을 사용합니다.
-    #     """
-    #     return super().create(request, *args, **kwargs)
-
 # 비즈니스 관리용 뷰셋
 class BusinessViewSet(viewsets.ModelViewSet):
     """
@@ -64,19 +57,18 @@ class PostViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.role == BusinessMember.BUSINESS_ADMIN:
             return Post.objects.filter(business=user.business, is_deleted=False)
-        return Post.objects.filter(author=user, is_deleted=False)
+        return Post.objects.filter(is_deleted=False)
+    
+    def get_object(self):
+        obj = super().get_object()
+        self.check_object_permissions(self.request, obj)
+        return obj
 
     def perform_create(self, serializer):
         """
         게시글 생성 시 author와 business 필드를 자동으로 설정.
         """
         serializer.save(author=self.request.user, business=self.request.user.business)
-
-    # def perform_update(self, serializer):
-    #     """
-    #     게시글 업데이트 시 추가적인 로직이 필요하다면 여기에 작성.
-    #     """
-    #     serializer.save()
 
     def perform_destroy(self, instance):
         """
@@ -122,19 +114,18 @@ class CommentViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.role == BusinessMember.BUSINESS_ADMIN:
             return Comment.objects.filter(post__business=user.business, is_deleted=False)
-        return Comment.objects.filter(author=user, is_deleted=False)
+        return Comment.objects.filter(is_deleted=False)
+
+    def get_object(self):
+        obj = super().get_object()
+        self.check_object_permissions(self.request, obj)
+        return obj
 
     def perform_create(self, serializer):
         """
         댓글 생성 시 author 필드를 자동으로 설정.
         """
         serializer.save(author=self.request.user)
-
-    # def perform_update(self, serializer):
-    #     """
-    #     댓글 업데이트 시 추가적인 로직이 필요하다면 여기에 작성.
-    #     """
-    #     serializer.save()
 
     def perform_destroy(self, instance):
         """

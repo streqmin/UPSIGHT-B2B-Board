@@ -27,8 +27,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = BusinessMember
         fields = ('username', 'password', 'password2', 'business', 'role')
         extra_kwargs = {
-            # 'first_name': {'required': False},
-            # 'last_name': {'required': False},
             'role': {'required': True},
         }
 
@@ -43,8 +41,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         validated_data.pop('password2')
         user = BusinessMember.objects.create(
             username=validated_data['username'],
-            # first_name=validated_data['first_name'],
-            # last_name=validated_data['last_name'],
             business=validated_data['business'],
             role=validated_data['role']
         )
@@ -73,4 +69,4 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ['id', 'post', 'author', 'content', 'is_public', 'is_deleted', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'author', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'post', 'author', 'created_at', 'updated_at']

@@ -10,7 +10,7 @@ def test_create_business(admin_authenticated_client):
     """
     비즈니스 생성 테스트 (관리자 권한)
     """
-    url = reverse('business-list')  # routers.py에서 BusinessViewSet에 대한 name이 'business-list'라고 가정
+    url = reverse('business-list')
     data = {
         'name': 'Test Business'
     }
@@ -25,10 +25,7 @@ def test_create_business_non_admin(authenticated_client):
     """
     url = reverse('business-list')
     data = {
-        'name': 'Unauthorized Business',
-        # 'address': '456 Unauthorized St',
-        # 'phone_number': '987-654-3210',
-        # 'website': 'https://www.unauthorized.com'
+        'name': 'Unauthorized Business'
     }
     response = authenticated_client.post(url, data, format='json')
     assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -52,10 +49,7 @@ def test_update_business(admin_authenticated_client, business):
     """
     url = reverse('business-detail', args=[business.id])
     data = {
-        'name': 'Updated Business',
-        # 'address': '789 Updated St',
-        # 'phone_number': '555-555-5555',
-        # 'website': 'https://www.updated.com'
+        'name': 'Updated Business'
     }
     response = admin_authenticated_client.put(url, data, format='json')
     assert response.status_code == status.HTTP_200_OK

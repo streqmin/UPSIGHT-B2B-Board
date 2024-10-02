@@ -11,8 +11,8 @@ class UserFactory(DjangoModelFactory):
         model = User
 
     username = Faker('user_name')
-    password = factory.PostGenerationMethodCall('set_password', 'password123!')  # 안전한 비밀번호 설정
-    role = 'member'  # 기본 역할을 MEMBER로 설정
+    password = factory.PostGenerationMethodCall('set_password', 'password123!')
+    role = 'member'  # 기본 역할을 BUSINESS_MEMBER로 설정
 
 class BusinessFactory(DjangoModelFactory):
     class Meta:
