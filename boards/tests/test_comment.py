@@ -3,7 +3,8 @@
 import pytest
 from rest_framework import status
 from django.urls import reverse
-from boards.models import Comment, Post
+from boards.models import Comment
+from boards.tests.factories import CommentFactory
 
 @pytest.mark.django_db
 def test_create_comment(authenticated_client, post, user):
@@ -82,14 +83,12 @@ def test_update_comment_non_owner(non_owner_authenticated_client, comment):
     """
     댓글 수정 시도 (비소유자 사용자)
     """
-    client = non_owner_authenticated_client  # 비소유자 클라이언트 사용
     url = reverse('comment-detail', args=[comment.id])
     data = {
         'content': 'Hacked comment content.',
-        'is_public': True,
         'post': comment.post.id
     }
-    response = client.put(url, data, format='json')
+    response = non_owner_authenticated_client.put(url, data, format='json')
     assert response.status_code == status.HTTP_403_FORBIDDEN
     comment.refresh_from_db()
     assert comment.content != 'Hacked comment content.'
@@ -118,13 +117,13 @@ def test_delete_comment_non_owner(non_owner_authenticated_client, comment):
     assert comment.is_deleted == False  # 댓글이 삭제되지 않았음을 확인
 
 @pytest.mark.django_db
-def test_my_comments(authenticated_client, comment_factory, user):
+def test_my_comments(authenticated_client, user):
     """
     'my_comments' 커스텀 액션 테스트
     """
-    comment1 = comment_factory(author=user)
-    comment2 = comment_factory(author=user)
-    url = reverse('comment-my_comments')  # routers.py에서 action에 대한 이름이 'comment-my-comments'라고 가정
+    comment1 = CommentFactory(author=user)
+    comment2 = CommentFactory(author=user)
+    url = reverse('comment-my-comments')  # views의 메소드 이름은 my_comments 이지만, reverse 에서는 '_' -> '-'
     response = authenticated_client.get(url, format='json')
     assert response.status_code == status.HTTP_200_OK
     assert len(response.data['results']) >= 2
