@@ -54,6 +54,10 @@ class PostViewSet(viewsets.ModelViewSet):
         - Admin: 소속된 비즈니스의 모든 게시글
         - Member: 자신이 작성한 게시글
         """
+        # Swagger 스키마 생성 중인 경우 모든 게시글을 반환하여 예외 방지
+        if getattr(self, 'swagger_fake_view', False):
+            return Post.objects.all()
+        
         user = self.request.user
         if user.role == BusinessMember.BUSINESS_ADMIN:
             return Post.objects.filter(business=user.business, is_deleted=False)
@@ -111,6 +115,10 @@ class CommentViewSet(viewsets.ModelViewSet):
         - Admin: 소속된 비즈니스의 모든 댓글
         - Member: 자신이 작성한 댓글
         """
+        # Swagger 스키마 생성 중인 경우 모든 댓글을 반환하여 예외 방지
+        if getattr(self, 'swagger_fake_view', False):
+            return Comment.objects.all()
+        
         user = self.request.user
         if user.role == BusinessMember.BUSINESS_ADMIN:
             return Comment.objects.filter(post__business=user.business, is_deleted=False)
