@@ -9,7 +9,7 @@ from .serializers import (
     CommentSerializer
 )
 from .models import Business, Post, Comment, BusinessMember
-from .permissions import IsBusinessAdmin, IsOwnerOrBusinessAdmin
+from .permissions import IsBusinessAdmin, IsOwnerOrBusinessAdmin, IsOwnerOrReadOnly
 
 # 사용자 등록을 위한 뷰
 class RegisterView(generics.CreateAPIView):
@@ -68,7 +68,7 @@ class PostViewSet(viewsets.ModelViewSet):
     인증된 사용자만 접근할 수 있으며, 게시글의 소유자 또는 비즈니스 관리자만 수정/삭제할 수 있습니다.
     """
     serializer_class = PostSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrBusinessAdmin]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrBusinessAdmin, IsOwnerOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['is_public']
     search_fields = ['title', 'content']

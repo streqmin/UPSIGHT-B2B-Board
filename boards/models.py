@@ -19,7 +19,7 @@ class BusinessMember(AbstractUser):
         (BUSINESS_MEMBER, 'Business Member'),
     ]
 
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default=BUSINESS_MEMBER)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=BUSINESS_MEMBER)
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='members', null=True, blank=True)
 
     def __str__(self):

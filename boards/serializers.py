@@ -25,10 +25,10 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BusinessMember
-        fields = ('username', 'password', 'password2', 'first_name', 'last_name', 'business', 'role')
+        fields = ('username', 'password', 'password2', 'business', 'role')
         extra_kwargs = {
-            'first_name': {'required': True},
-            'last_name': {'required': True},
+            # 'first_name': {'required': False},
+            # 'last_name': {'required': False},
             'role': {'required': True},
         }
 
@@ -43,8 +43,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         validated_data.pop('password2')
         user = BusinessMember.objects.create(
             username=validated_data['username'],
-            first_name=validated_data['first_name'],
-            last_name=validated_data['last_name'],
+            # first_name=validated_data['first_name'],
+            # last_name=validated_data['last_name'],
             business=validated_data['business'],
             role=validated_data['role']
         )
