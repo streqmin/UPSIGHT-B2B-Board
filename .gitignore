@@ -32,3 +32,6 @@ logs/
 
 # Node.js (if applicable)
 node_modules/
+
+# coverage
+*.coverage
