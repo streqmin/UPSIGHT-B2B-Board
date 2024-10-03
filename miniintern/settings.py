@@ -79,19 +79,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'miniintern.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
 AUTH_USER_MODEL = 'boards.BusinessMember'
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DATABASE_NAME', 'test'),
+        'NAME': os.environ.get('DATABASE_NAME', 'UPSIGHT'),
         'USER': os.environ.get('DATABASE_USER', 'upsight'),
         'PASSWORD': os.environ.get('DATABASE_PASSWORD', '1q2w3e4r!'),
-        'HOST': os.environ.get('DATABASE_HOST', 'localhost'),  # Docker 사용 시 'db'
+        'HOST': os.environ.get('DATABASE_HOST', 'localhost'),
         'PORT': '5432',
     }
 }
