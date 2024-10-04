@@ -60,7 +60,7 @@ class PostViewSet(viewsets.ModelViewSet):
         
         user = self.request.user
         if user.role == BusinessMember.BUSINESS_ADMIN:
-            return Post.objects.filter(business=user.business, is_deleted=False)
+            return Post.objects.filter(business=user.business)
         return Post.objects.filter(is_deleted=False)
     
     def get_object(self):
@@ -121,7 +121,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         
         user = self.request.user
         if user.role == BusinessMember.BUSINESS_ADMIN:
-            return Comment.objects.filter(post__business=user.business, is_deleted=False)
+            return Comment.objects.filter(post__business=user.business)
         return Comment.objects.filter(is_deleted=False)
 
     def get_object(self):

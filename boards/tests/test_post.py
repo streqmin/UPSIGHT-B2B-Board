@@ -99,11 +99,34 @@ def test_order_posts_by_created_at_desc(authenticated_client, user):
     assert response.data['results'][1]['id'] == post1.id
 
 @pytest.mark.django_db
+def test_order_posts_by_created_at_aesc(authenticated_client, user):
+    """
+    작성일 기준 내림차순 정렬 테스트
+    """
+    post1 = PostFactory(
+        author=user,
+        business=user.business,
+        title='First Post',
+        created_at=timezone.make_aware(datetime(2023, 1, 1, 0, 0, 0))
+    )
+    post2 = PostFactory(
+        author=user,
+        business=user.business,
+        title='Second Post',
+        created_at=timezone.make_aware(datetime(2023, 2, 1, 0, 0, 0))
+    )
+    url = reverse('post-list') + '?ordering=created_at'
+    response = authenticated_client.get(url, format='json')
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data['results'][0]['id'] == post1.id
+    assert response.data['results'][1]['id'] == post2.id
+
+@pytest.mark.django_db
 def test_pagination_posts(authenticated_client, user):
     """
     게시글 페이지네이션 테스트
     """
-    for _ in range(20):
+    for _ in range(60):
         PostFactory(author=user)
     url = reverse('post-list') + '?page=1&limit=20'  # 페이지네이션 파라미터에 맞게 수정
     response = authenticated_client.get(url, format='json')
@@ -128,6 +151,20 @@ def test_update_post(authenticated_client, post):
     post.refresh_from_db()
     assert post.title == 'Updated Post Title'
     assert post.is_public == False
+
+@pytest.mark.django_db
+def test_update_post_to_public(authenticated_client, draft_post):
+    """
+    게시글 수정 테스트 (게시글 소유자)
+    """
+    url = reverse('post-detail', args=[draft_post.id])
+    data = {
+        'is_public': True
+    }
+    response = authenticated_client.put(url, data, format='json')
+    assert response.status_code == status.HTTP_200_OK
+    draft_post.refresh_from_db()
+    assert draft_post.is_public == True
 
 @pytest.mark.django_db
 def test_update_post_non_owner(non_owner_authenticated_client, post):
