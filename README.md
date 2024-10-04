@@ -42,6 +42,7 @@ pip install psycopg2-binary
 ## 👥 JWT 설정
 
 ```python
+# /miniintern/settings.py
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),

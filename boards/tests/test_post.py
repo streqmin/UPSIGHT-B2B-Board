@@ -159,6 +159,8 @@ def test_update_post_to_public(authenticated_client, draft_post):
     """
     url = reverse('post-detail', args=[draft_post.id])
     data = {
+        'title': draft_post.title,
+        'content': draft_post.content,
         'is_public': True
     }
     response = authenticated_client.put(url, data, format='json')

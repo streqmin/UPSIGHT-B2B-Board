@@ -62,11 +62,6 @@ class PostViewSet(viewsets.ModelViewSet):
         if user.role == BusinessMember.BUSINESS_ADMIN:
             return Post.objects.filter(business=user.business)
         return Post.objects.filter(is_deleted=False)
-    
-    def get_object(self):
-        obj = super().get_object()
-        self.check_object_permissions(self.request, obj)
-        return obj
 
     def perform_create(self, serializer):
         """
@@ -123,11 +118,6 @@ class CommentViewSet(viewsets.ModelViewSet):
         if user.role == BusinessMember.BUSINESS_ADMIN:
             return Comment.objects.filter(post__business=user.business)
         return Comment.objects.filter(is_deleted=False)
-
-    def get_object(self):
-        obj = super().get_object()
-        self.check_object_permissions(self.request, obj)
-        return obj
 
     def perform_create(self, serializer):
         """

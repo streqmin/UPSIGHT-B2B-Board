@@ -23,6 +23,42 @@ def test_register_user(api_client, business):
     assert BusinessMember.objects.filter(username='testuser').exists()
 
 @pytest.mark.django_db
+def test_register_password_mismatch(api_client, business):
+    """
+    사용자 등록 시 password와 password2가 일치하지 않으면 400 Bad Request 응답을 반환하는지 테스트
+    """
+    url = reverse('auth_register')
+    data = {
+        'username': 'testuser',
+        'password': 'password123!',
+        'password2': 'differentpassword',
+        'role': 'member',
+        'business': business.id
+    }
+    response = api_client.post(url, data, format='json')
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert 'password' in response.data
+    assert response.data['password'] == ["Password fields didn't match."]
+
+@pytest.mark.django_db
+def test_register_invalid_role(api_client, business):
+    """
+    사용자 등록 시 유효하지 않은 role 값을 입력하면 400 Bad Request 응답을 반환하는지 테스트
+    """
+    url = reverse('auth_register')  # RegisterView의 URL 이름
+    data = {
+        'username': 'testuser',
+        'password': 'password123!',
+        'password2': 'password123!',
+        'role': 'invalid_role',  # 유효하지 않은 역할
+        'business': business.id
+    }
+    response = api_client.post(url, data, format='json')
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert 'role' in response.data
+    assert response.data['role'] == ['"invalid_role" is not a valid choice.']
+
+@pytest.mark.django_db
 def test_register_user_duplicate_username(api_client, user):
     """
     중복된 사용자 이름으로 등록 시 실패 테스트

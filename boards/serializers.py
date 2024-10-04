@@ -34,7 +34,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError({"password": "Password fields didn't match."})
         if attrs['role'] not in ['admin', 'member']:
-            raise serializers.ValidationError({"role": "Role must be either 'admin' or 'member'."})
+            raise serializers.ValidationError({"role": f"{attrs['role']} is not a valid choice."})
         return attrs
 
     def create(self, validated_data):
@@ -60,7 +60,7 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'business', 'author', 'title', 'content', 'is_public', 'is_deleted', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'author', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'business', 'author', 'created_at', 'updated_at']
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')

@@ -66,10 +66,3 @@ def draft_post(db, user, business):
 def comment(db, user, post):
     """Comment 인스턴스를 반환하는 Fixture"""
     return CommentFactory(author=user, post=post)
-
-@pytest.fixture
-def comment_factory(db, user, post):
-    """동적으로 Comment를 생성할 수 있는 Factory 함수 Fixture"""
-    def create_comment(**kwargs):
-        return CommentFactory(author=user, post=post, **kwargs)
-    return create_comment
