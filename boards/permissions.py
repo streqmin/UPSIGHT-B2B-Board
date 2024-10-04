@@ -28,4 +28,4 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         # 수정/삭제 요청은 객체 소유자에게만 허용
-        return obj.author == request.user
+        return obj.author == request.user or request.user.role == 'admin'

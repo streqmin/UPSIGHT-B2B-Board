@@ -1,6 +1,7 @@
 from rest_framework import generics, viewsets, permissions, filters, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from .serializers import (
     RegisterSerializer,
@@ -60,8 +61,8 @@ class PostViewSet(viewsets.ModelViewSet):
         
         user = self.request.user
         if user.role == BusinessMember.BUSINESS_ADMIN:
-            return Post.objects.filter(business=user.business)
-        return Post.objects.filter(is_deleted=False)
+            return Post.objects.all()
+        return Post.objects.filter(Q(is_public=True) | Q(author=user), is_deleted=False)
 
     def perform_create(self, serializer):
         """
@@ -116,8 +117,8 @@ class CommentViewSet(viewsets.ModelViewSet):
         
         user = self.request.user
         if user.role == BusinessMember.BUSINESS_ADMIN:
-            return Comment.objects.filter(post__business=user.business)
-        return Comment.objects.filter(is_deleted=False)
+            return Comment.objects.all()
+        return Comment.objects.filter(is_public=True, is_deleted=False)
 
     def perform_create(self, serializer):
         """

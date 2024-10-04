@@ -63,6 +63,11 @@ def draft_post(db, user, business):
     return DraftPostFactory(author=user, business=business)
 
 @pytest.fixture
+def deleted_post(db, user, business):
+    """DeletedPost 인스턴스를 반환하는 Fixture"""
+    return DeletedPostFactory(author=user, business=business)
+
+@pytest.fixture
 def comment(db, user, post):
     """Comment 인스턴스를 반환하는 Fixture"""
     return CommentFactory(author=user, post=post)
