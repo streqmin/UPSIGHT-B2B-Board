@@ -128,3 +128,4 @@ def test_my_posts(authenticated_client, user):
     assert len(response.data['results']) >= 2
     assert any(p['id'] == post1.id for p in response.data['results'])
     assert any(p['id'] == post2.id for p in response.data['results'])
+    assert all(p['author'] == user.username for p in response.data['results'])

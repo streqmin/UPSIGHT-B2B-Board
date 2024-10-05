@@ -129,3 +129,4 @@ def test_my_comments(authenticated_client, user):
     assert len(response.data['results']) >= 2
     assert any(c['id'] == comment1.id for c in response.data['results'])
     assert any(c['id'] == comment2.id for c in response.data['results'])
+    assert all(p['author'] == user.username for p in response.data['results'])

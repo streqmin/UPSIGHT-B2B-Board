@@ -84,13 +84,10 @@ class PostViewSet(viewsets.ModelViewSet):
         URL: /api/posts/my_posts/
         """
         user = request.user
-        posts = self.get_queryset()
+        posts = self.get_queryset().filter(author=user)
         page = self.paginate_queryset(posts)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(posts, many=True)
-        return Response(serializer.data)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
 # 댓글 관리용 뷰셋
 class CommentViewSet(viewsets.ModelViewSet):
@@ -139,10 +136,8 @@ class CommentViewSet(viewsets.ModelViewSet):
         현재 사용자가 작성한 모든 댓글을 조회하는 커스텀 액션.
         URL: /api/comments/my_comments/
         """
-        comments = self.get_queryset()
+        user = request.user
+        comments = self.get_queryset().filter(author=user)
         page = self.paginate_queryset(comments)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(comments, many=True)
-        return Response(serializer.data)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
