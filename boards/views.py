@@ -98,7 +98,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrBusinessAdmin]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['is_public']
+    filterset_fields = ['post', 'is_public']
     search_fields = ['content']
     ordering_fields = ['created_at']
 

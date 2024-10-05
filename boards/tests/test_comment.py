@@ -61,6 +61,66 @@ def test_retrieve_comment(authenticated_client, comment):
     assert response.data['content'] == comment.content
 
 @pytest.mark.django_db
+def test_retrieve_comments_by_post_id(authenticated_client, user, other_user, post):
+    """
+    특정 게시글 조회 시 해당 게시글의 모든 공개되고 삭제되지 않은 댓글이 반환되는지 테스트
+    """
+    comment1 = CommentFactory(post=post, author=user)
+    comment2 = CommentFactory(post=post, author=other_user)
+    deleted_comment = CommentFactory(post=post, author=user, is_deleted=True)
+    private_comment = CommentFactory(post=post, author=user, is_public=False)
+    
+    url = reverse('comment-list')
+    response = authenticated_client.get(url, {'post': post.id}, format='json')
+    
+    assert response.status_code == status.HTTP_200_OK
+    assert 'results' in response.data
+    assert len(response.data['results']) == 2  # 삭제되거나 비공개인 댓글은 포함되지 않음
+    
+    returned_comment_ids = [comment['id'] for comment in response.data['results']]
+    assert comment1.id in returned_comment_ids
+    assert comment2.id in returned_comment_ids
+    assert deleted_comment.id not in returned_comment_ids
+    assert private_comment.id not in returned_comment_ids
+
+@pytest.mark.django_db
+def test_retrieve_comments_by_post_id_as_admin(admin_authenticated_client, user, other_user, post):
+    """
+    특정 게시글 조회 시 해당 게시글의 모든 공개되고 삭제되지 않은 댓글이 반환되는지 테스트
+    """
+    comment1 = CommentFactory(post=post, author=user)
+    comment2 = CommentFactory(post=post, author=other_user)
+    deleted_comment = CommentFactory(post=post, author=user, is_deleted=True)
+    private_comment = CommentFactory(post=post, author=user, is_public=False)
+    
+    url = reverse('comment-list')
+    response = admin_authenticated_client.get(url, {'post': post.id}, format='json')
+    
+    assert response.status_code == status.HTTP_200_OK
+    assert 'results' in response.data
+    assert len(response.data['results']) == 4  # 삭제되거나 비공개인 댓글은 포함되지 않음
+    
+    returned_comment_ids = [comment['id'] for comment in response.data['results']]
+    assert comment1.id in returned_comment_ids
+    assert comment2.id in returned_comment_ids
+    assert deleted_comment.id in returned_comment_ids
+    assert private_comment.id in returned_comment_ids
+
+@pytest.mark.django_db
+def test_retrieve_comments_by_nonexistent_post(authenticated_client, post):
+    """
+    댓글이 존재하지 않는 게시글의 댓글을 조회하려 할 때 0개의 댓글이 반환되는지 테스트.
+    """
+    # API 엔드포인트 설정 (존재하지 않는 게시글 ID)
+    url = reverse('comment-list')
+    response = authenticated_client.get(url, {'post': post.id}, format='json')  # 9999는 존재하지 않는 ID
+    
+    # 응답 검증
+    assert response.status_code == status.HTTP_200_OK
+    assert 'results' in response.data
+    assert len(response.data['results']) == 0
+
+@pytest.mark.django_db
 def test_update_comment(authenticated_client, comment):
     """
     댓글 수정 테스트 (댓글 소유자)
