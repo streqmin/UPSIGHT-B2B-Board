@@ -37,7 +37,6 @@ def test_create_comment_business_admin(admin_authenticated_client, post, admin_u
     response = admin_authenticated_client.post(url, data, format='json')
     assert response.status_code == status.HTTP_201_CREATED
     comment = Comment.objects.get(content='Admin Comment.')
-    # comment = Comment.objects.get(author = admin_user)
     assert comment.author == admin_user
     assert comment.post == post
 
