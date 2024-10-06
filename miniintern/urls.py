@@ -12,8 +12,7 @@ schema_view = get_schema_view(
     openapi.Info(  
     title="B2B Django Board API",
     default_version='v1',
-    description="API documentation for the B2B Django Board system",
-    ),
+    description="API documentation for the B2B Django Board system"),
     
     public=True,
     permission_classes=(permissions.AllowAny,),
