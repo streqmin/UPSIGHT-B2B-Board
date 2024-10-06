@@ -21,55 +21,15 @@ pip install pytest-cov
 pip install psycopg2-binary
 ```
 
-## 🖥️ models.py
-
-> | 개체             | 모델명         |
-> | ---------------- | -------------- |
-> | 고객사           | Business       |
-> | 고객사 소속 회원 | BusinessMember |
-> | 게시글           | Post           |
-> | 댓글             | Comment        |
-
-## 🖥️ views.py
-
-> | 도메인      | 뷰셋 이름       | 상속 뷰셋              |
-> | ----------- | --------------- | ---------------------- |
-> | 사용자 등록 | RegisterView    | generics.CreateAPIView |
-> | 고객사      | BusinessViewSet | viewsets.ModelViewSet  |
-> | 게시글      | PostViewSet     | viewsets.ModelViewSet  |
-> | 댓글        | CommentViewSet  | viewsets.ModelViewSet  |
-
-## 👥 JWT 설정
-
-```python
-# /miniintern/settings.py
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': False,
-    'BLACKLIST_AFTER_ROTATION': False,
-    'ALGORITHM': 'HS256',
-    'SIGNING_KEY': SECRET_KEY,
-    'VERIFYING_KEY': None,
-    'AUTH_HEADER_TYPES': ('Bearer',),
-    'USER_ID_FIELD': 'id',
-    'USER_ID_CLAIM': 'user_id',
-    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
-    'TOKEN_TYPE_CLAIM': 'token_type'
-}
-```
-
 ---
 
-## 📄 API 문서 확인하기
+# 📄 API 문서 확인하기
 
 서버를 실행한 후, 다음 경로로 접속하여 API 문서를 확인할 수 있습니다:
 
-Swagger UI: http://localhost:8000/swagger/ 🐍✨
+-   Swagger UI: http://localhost:8000/swagger/ 🐍✨
 
-Redoc: http://localhost:8000/redoc/ 📚🔍
-
-### 이제 API 엔드포인트를 탐색하고, 요청을 테스트해보세요! 🚀
+-   Redoc: http://localhost:8000/redoc/ 📚🔍
 
 ---
 
