@@ -24,13 +24,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-t3lz*0%4p!l^+_p6($^9efukv8l7g3#(55x&7uvfrc7)8h^&_i'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', '0') == '1'
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -84,10 +82,10 @@ AUTH_USER_MODEL = 'boards.BusinessMember'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DATABASE_NAME', 'UPSIGHT'),
-        'USER': os.environ.get('DATABASE_USER', 'upsight'),
-        'PASSWORD': os.environ.get('DATABASE_PASSWORD', '1q2w3e4r!'),
-        'HOST': os.environ.get('DATABASE_HOST', 'localhost'),
+        'NAME': os.getenv('POSTGRES_DB', 'myproject_db'),
+        'USER': os.getenv('POSTGRES_USER', 'myproject_user'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'myproject_password'),
+        'HOST': 'db',  # docker-compose에서 정의한 서비스 이름
         'PORT': '5432',
     }
 }

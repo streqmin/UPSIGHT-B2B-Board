@@ -39,9 +39,6 @@ pip install psycopg2-binary
 > | 게시글      | PostViewSet     | viewsets.ModelViewSet  |
 > | 댓글        | CommentViewSet  | viewsets.ModelViewSet  |
 
--   DRF의 query_set 설정을 활용하여 권한 별 접근 데이터에 차등을 구현함
--   permission은 일반 member 와 admin 으로 구분됨
-
 ## 👥 JWT 설정
 
 ```python
