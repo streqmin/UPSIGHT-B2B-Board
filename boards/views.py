@@ -1,5 +1,4 @@
-from rest_framework import generics, viewsets, permissions, filters, status
-from rest_framework.response import Response
+from rest_framework import generics, viewsets, permissions, filters
 from rest_framework.decorators import action
 from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
