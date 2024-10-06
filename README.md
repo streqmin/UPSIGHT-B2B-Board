@@ -21,6 +21,36 @@ pip install pytest-cov
 pip install psycopg2-binary
 ```
 
+## 🏗️ Django 프로젝트 구조
+
+-   **miniintern** : Django project folder
+-   **boards** : Django app folder
+
+```
+miniintern/
+├── boards/
+│ ├── migrations/
+│ ├── __init__.py
+│ ├── admin.py
+│ ├── apps.py
+│ ├── models.py
+│ ├── serializers.py
+│ ├── tests/
+│ ├── urls.py
+│ └── views.py
+├── miniintern/
+│ ├── __init__.py
+│ ├── asgi.py
+│ ├── settings.py
+│ ├── urls.py
+│ └── wsgi.py
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+├── manage.py
+└── .env
+```
+
 ---
 
 # 📄 API 문서 확인하기
@@ -90,3 +120,7 @@ pip install psycopg2-binary
 | `ordering`          | `created_at` 기준 정렬       |
 
 ---
+
+```
+
+```
