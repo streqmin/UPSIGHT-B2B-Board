@@ -1,7 +1,7 @@
 ---
 name: UPSIGHT 최종 코드 리뷰 반영 수정 사항
 about: "[미니인턴] UPSIGHT  게시판 과제의 최종 코드 리뷰를 기반으로 하여 개선할 내용을 정리합니다."
-title: "[피드백 반영] 작업 범위 - "
+title: "[피드백 반영] "
 labels: ''
 assignees: ''
 
