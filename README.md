@@ -1,5 +1,23 @@
 # UPSIGHT B2B Board
 
+## 💿 서버 구동 방법
+
+-   Docker 를 통한 구동
+
+```shell
+./run_docker.sh
+```
+
+-   Django 프로젝트 자체만 실행
+
+Docker 를 사용하지 않을 경우, python 가상환경에서 명령어를 실행하는 것을 추천합니다.
+
+<small>_서버 실행 전 설치되는 패키지들에 의해 패키지 충돌, 시스템 의존성 문제, 버전 관리 문제 등이 발생할 수 있습니다._</small>
+
+```shell
+./run_django.sh
+```
+
 ## 📚 사용된 라이브러리
 
 ```shell
