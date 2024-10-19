@@ -74,7 +74,7 @@ DATABASES = {
         'NAME': os.environ.get('DATABASE_NAME', 'UPSIGHT'),
         'USER': os.environ.get('DATABASE_USER', 'upsight'),
         'PASSWORD': os.environ.get('DATABASE_PASSWORD', '1q2w3e4r!'),
-        'HOST': os.environ.get('DATABASE_HOST', 'db'),
+        'HOST': os.environ.get('DATABASE_HOST', 'localhost'),
     }
 }
 
