@@ -17,7 +17,7 @@ def test_delete_post(authenticated_client, post):
     response = authenticated_client.delete(url, format='json')
     assert response.status_code == status.HTTP_204_NO_CONTENT
     post.refresh_from_db()
-    assert post.is_deleted == True
+    assert post.deleted_at 
 
 @pytest.mark.django_db
 def test_delete_post_non_owner(non_owner_authenticated_client, post):
@@ -28,7 +28,7 @@ def test_delete_post_non_owner(non_owner_authenticated_client, post):
     response = non_owner_authenticated_client.delete(url, format='json')
     assert response.status_code == status.HTTP_403_FORBIDDEN
     post.refresh_from_db()
-    assert post.is_deleted == False
+    assert post.deleted_at is None
 
 @pytest.mark.django_db
 def test_delete_post_unauthenticated(api_client, post):

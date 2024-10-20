@@ -5,6 +5,7 @@ from rest_framework import status
 from django.urls import reverse
 from boards.models import Comment
 from boards.tests.factories import CommentFactory
+from django.utils import timezone
 
 @pytest.mark.django_db
 def test_create_comment(authenticated_client, post, user):
@@ -67,7 +68,7 @@ def test_retrieve_comments_by_post_id(authenticated_client, user, other_user, po
     """
     comment1 = CommentFactory(post=post, author=user)
     comment2 = CommentFactory(post=post, author=other_user)
-    deleted_comment = CommentFactory(post=post, author=user, is_deleted=True)
+    deleted_comment = CommentFactory(post=post, author=user, deleted_at = timezone.now())
     private_comment = CommentFactory(post=post, author=user, is_public=False)
     
     url = reverse('comment-list')
@@ -90,7 +91,7 @@ def test_retrieve_comments_by_post_id_as_admin(admin_authenticated_client, user,
     """
     comment1 = CommentFactory(post=post, author=user)
     comment2 = CommentFactory(post=post, author=other_user)
-    deleted_comment = CommentFactory(post=post, author=user, is_deleted=True)
+    deleted_comment = CommentFactory(post=post, author=user, deleted_at = timezone.now())
     private_comment = CommentFactory(post=post, author=user, is_public=False)
     
     url = reverse('comment-list')
@@ -146,7 +147,7 @@ def test_update_comment_non_owner(non_owner_authenticated_client, comment):
     data = {
         'content': 'Hacked comment content.',
         'is_public': True,
-        'is_deleted': False
+        'deleted_at': None
     }
     response = non_owner_authenticated_client.put(url, data, format='json')
     assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -162,7 +163,7 @@ def test_delete_comment(authenticated_client, comment):
     response = authenticated_client.delete(url, format='json')
     assert response.status_code == status.HTTP_204_NO_CONTENT
     comment.refresh_from_db()
-    assert comment.is_deleted == True
+    assert comment.deleted_at
 
 @pytest.mark.django_db
 def test_delete_comment_non_owner(non_owner_authenticated_client, comment):
@@ -174,7 +175,7 @@ def test_delete_comment_non_owner(non_owner_authenticated_client, comment):
     response = client.delete(url, format='json')
     assert response.status_code == status.HTTP_403_FORBIDDEN
     comment.refresh_from_db()
-    assert comment.is_deleted == False
+    assert comment.deleted_at is None
 
 @pytest.mark.django_db
 def test_my_comments(authenticated_client, user):

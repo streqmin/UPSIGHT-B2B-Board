@@ -3,6 +3,7 @@ from factory import Faker
 from factory.django import DjangoModelFactory
 from django.contrib.auth import get_user_model
 from boards.models import Business, Post, Comment
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -27,21 +28,21 @@ class PostFactory(DjangoModelFactory):
     title = Faker('sentence', nb_words=6)
     content = Faker('paragraph', nb_sentences=3)
     is_public = True
-    is_deleted = False
+    deleted_at = None
     author = factory.SubFactory(UserFactory)
     business = factory.SubFactory(BusinessFactory)
     
 class PublishedPostFactory(PostFactory):
     is_public = True
-    is_deleted = False
+    deleted_at = None
 
 class DraftPostFactory(PostFactory):
     is_public = False
-    is_deleted = False
+    deleted_at = None
 
 class DeletedPostFactory(PostFactory):
     is_public = False
-    is_deleted = True
+    deleted_at = factory.LazyFunction(timezone.now)
 
 class CommentFactory(DjangoModelFactory):
     class Meta:
@@ -49,6 +50,6 @@ class CommentFactory(DjangoModelFactory):
 
     content = Faker('sentence', nb_words=100)
     is_public = True
-    is_deleted = False
+    deleted_at = None
     author = factory.SubFactory(UserFactory)
     post = factory.SubFactory(PostFactory)

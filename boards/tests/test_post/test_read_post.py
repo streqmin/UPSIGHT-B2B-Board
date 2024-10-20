@@ -34,17 +34,17 @@ def test_retrieve_post(authenticated_client, post):
 @pytest.mark.django_db
 def test_retrieve_deleted_post_business_admin(admin_authenticated_client, deleted_post):
     """
-    is_deleted=True인 게시글을 비즈니스 관리자가 개별 조회 시 접근이 가능한지 테스트
+    deleted_at이 존재하는 게시글을 비즈니스 관리자가 개별 조회 시 접근이 가능한지 테스트
     """
     url = reverse('post-detail', args=[deleted_post.id])
     response = admin_authenticated_client.get(url, format='json')
     assert response.status_code == status.HTTP_200_OK
-    assert response.data['is_deleted'] == True
+    assert response.data['deleted_at'] is not None
 
 @pytest.mark.django_db
 def test_retrieve_deleted_post(authenticated_client, deleted_post):
     """
-    is_deleted=True인 게시글을 개별 조회 시 접근이 제한되는지 테스트
+    deleted_at 이 존재하는 게시글을 개별 조회 시 접근이 제한되는지 테스트
     """
     url = reverse('post-detail', args=[deleted_post.id])
     response = authenticated_client.get(url, format='json')

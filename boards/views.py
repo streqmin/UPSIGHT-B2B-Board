@@ -10,6 +10,7 @@ from .serializers import (
 )
 from .models import Business, Post, Comment, BusinessMember
 from .permissions import IsBusinessAdmin, IsOwnerOrBusinessAdmin
+from django.utils import timezone
 
 # 사용자 등록을 위한 뷰
 class RegisterView(generics.CreateAPIView):
@@ -61,7 +62,7 @@ class PostViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.role == BusinessMember.BUSINESS_ADMIN:
             return Post.objects.all()
-        return Post.objects.filter(Q(is_public=True) | Q(author=user), is_deleted=False)
+        return Post.objects.filter(Q(is_public=True) | Q(author=user), deleted_at__isnull=True)
 
     def perform_create(self, serializer):
         """
@@ -71,9 +72,9 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def perform_destroy(self, instance):
         """
-        게시글 삭제 대신 is_deleted 필드를 True로 설정하여 논리적 삭제.
+        게시글 삭제 대신 deleted_at 필드를 현재 시각으로 설정하여 논리적 삭제.
         """
-        instance.is_deleted = True
+        instance.deleted_at = timezone.now()
         instance.save()
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
@@ -114,7 +115,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.role == BusinessMember.BUSINESS_ADMIN:
             return Comment.objects.all()
-        return Comment.objects.filter(is_public=True, is_deleted=False)
+        return Comment.objects.filter(is_public=True, deleted_at__isnull=True)
 
     def perform_create(self, serializer):
         """
@@ -124,9 +125,9 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def perform_destroy(self, instance):
         """
-        댓글 삭제 대신 is_deleted 필드를 True로 설정하여 논리적 삭제.
+        게시글 삭제 대신 deleted_at 필드를 현재 시각으로 설정하여 논리적 삭제.
         """
-        instance.is_deleted = True
+        instance.deleted_at = timezone.now()
         instance.save()
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
