@@ -1,8 +1,58 @@
 from rest_framework import generics, viewsets, permissions, filters
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from .serializers import RegisterSerializer, BusinessSerializer
 from .models import Business, BusinessMember
 from authentication.permissions import IsBusinessAdmin
+
+# JWT를 쿠키에 넣는 커스텀 로그인 뷰
+class CustomTokenObtainPairView(TokenObtainPairView):
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)  # 기본 JWT 발급 로직 실행
+        data = response.data
+        access_token = data.get('access')
+        refresh_token = data.get('refresh')
+
+        # 응답에 쿠키 설정
+        response = JsonResponse({'message': 'Login successful'})
+        if access_token:
+            response.set_cookie(
+                'access_token',
+                access_token,
+                httponly=True,   # JavaScript에서 접근 불가 (보안 강화)
+                secure=True,     # HTTPS에서만 전송
+                samesite='Lax'   # CSRF 방지
+            )
+        if refresh_token:
+            response.set_cookie(
+                'refresh_token',
+                refresh_token,
+                httponly=True,
+                secure=True,
+                samesite='Lax'
+            )
+        return response
+
+# JWT Refresh 토큰도 쿠키로 설정
+class CustomTokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)  # 기본 토큰 갱신 로직 실행
+        data = response.data
+        access_token = data.get('access')
+
+        # 쿠키에 갱신된 Access 토큰 설정
+        response = JsonResponse({'message': 'Token refreshed'})
+        if access_token:
+            response.set_cookie(
+                'access_token',
+                access_token,
+                httponly=True,
+                secure=True,
+                samesite='Lax'
+            )
+        return response
+
 
 
 # 사용자 등록을 위한 뷰
