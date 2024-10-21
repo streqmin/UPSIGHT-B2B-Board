@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_yasg',
     # local app
+    'authentication',
     'boards'
 ]
 
@@ -66,7 +67,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'miniintern.wsgi.application'
 
-AUTH_USER_MODEL = 'boards.BusinessMember'
+AUTH_USER_MODEL = 'authentication.BusinessMember'
 
 DATABASES = {
     'default': {
