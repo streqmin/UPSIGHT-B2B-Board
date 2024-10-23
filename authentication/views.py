@@ -12,8 +12,8 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         # 기본 JWT 발급 로직 실행
         response = super().post(request, *args, **kwargs)
         data = response.data
-        access_token = data.get('access')
-        refresh_token = data.get('refresh')
+        access_token = data.pop('access', None)  # JWT 토큰을 응답 본문에서 제거
+        refresh_token = data.pop('refresh', None)
 
     # JWT가 존재하는 경우(로그인 성공)
         response = Response({'message': 'Login successful'}, status=response.status_code)
