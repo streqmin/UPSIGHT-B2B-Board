@@ -1,7 +1,8 @@
 # boards/admin.py
 
 from django.contrib import admin
-from .models import Business, BusinessMember, Post, Comment
+from .models import Post, Comment
+from authentication.models import Business, BusinessMember
 from django.contrib.auth.admin import UserAdmin
 
 class BusinessMemberAdmin(UserAdmin):
