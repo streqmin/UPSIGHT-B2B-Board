@@ -1,6 +1,6 @@
 from rest_framework import generics, viewsets, permissions, filters
+from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from .serializers import RegisterSerializer, BusinessSerializer
 from .models import Business, BusinessMember
@@ -9,19 +9,20 @@ from authentication.permissions import IsBusinessAdmin
 # JWT를 쿠키에 넣는 커스텀 로그인 뷰
 class CustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)  # 기본 JWT 발급 로직 실행
+        # 기본 JWT 발급 로직 실행
+        response = super().post(request, *args, **kwargs)
         data = response.data
         access_token = data.get('access')
         refresh_token = data.get('refresh')
 
-        # 응답에 쿠키 설정
-        response = JsonResponse({'message': 'Login successful'})
+    # JWT가 존재하는 경우(로그인 성공)
+        response = Response({'message': 'Login successful'}, status=response.status_code)
         if access_token:
             response.set_cookie(
                 'access_token',
                 access_token,
                 httponly=True,   # JavaScript에서 접근 불가 (보안 강화)
-                secure=True,     # HTTPS에서만 전송
+                secure=True,     # HTTPS에서만 전송 (개발 환경에서는 False 가능)
                 samesite='Lax'   # CSRF 방지
             )
         if refresh_token:
@@ -33,6 +34,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 samesite='Lax'
             )
         return response
+
 
 # JWT Refresh 토큰도 쿠키로 설정
 class CustomTokenRefreshView(TokenRefreshView):
