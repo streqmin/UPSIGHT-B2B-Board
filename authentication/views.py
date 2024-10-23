@@ -41,10 +41,10 @@ class CustomTokenRefreshView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)  # 기본 토큰 갱신 로직 실행
         data = response.data
-        access_token = data.get('access')
+        access_token = data.pop('access', None)
 
         # 쿠키에 갱신된 Access 토큰 설정
-        response = JsonResponse({'message': 'Token refreshed'})
+        response = Response({'message': 'Token refreshed'})
         if access_token:
             response.set_cookie(
                 'access_token',
