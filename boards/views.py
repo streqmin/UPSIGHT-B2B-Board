@@ -1,5 +1,6 @@
 from rest_framework import viewsets, permissions, filters
 from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound
 from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from .serializers import PostSerializer, CommentSerializer
@@ -46,6 +47,9 @@ class PostViewSet(viewsets.ModelViewSet):
         """
         게시글 삭제 대신 deleted_at 필드를 현재 시각으로 설정하여 논리적 삭제.
         """
+        if instance.deleted_at is not None:
+            raise NotFound("이 게시글은 이미 삭제된 상태입니다.")
+        
         instance.deleted_at = timezone.now()
         instance.save()
 
