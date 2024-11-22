@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>UPSIGHT 게시판</title>
+        <!-- CSS -->
+        <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    </head>
+    <body>
+        <header>
+            <nav>
+                <ul>
+                    <li>
+                        <a href="/">홈</a>
+                    </li>
+                    <li>
+                        <a href="/board/posts/">게시판</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li>
+                            <a href="/board/posts/my_posts/">내 게시글</a>
+                        </li>
+                        <li>
+                            <a href="/board/posts/create/">글쓰기</a>
+                        </li>
+                        <li>
+                            <a href="/auth/logout/">로그아웃</a>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href="/login/">로그인</a>
+                        </li>
+                        <li>
+                            <a href="/register/">회원가입</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </header>
+        <main>
+            {% block content %}
+            {% endblock %}
+        </main>
+        <footer>
+            <p>&copy; 2024 UPSIGHT 게시판</p>
+        </footer>
+        <!-- JavaScript -->
+        <script src="{% static 'js/main.js' %}"></script>
+        {% block javascript %}
+        {% endblock %}
+    </body>
+</html>
