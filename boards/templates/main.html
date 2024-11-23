@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>게시판</h2>
+  <div id="post-list"></div>
+  <div id="pagination">
+    <button id="prev-page">&lt;</button>
+    <span id="current-page"></span>
+    <button id="next-page">&gt;</button>
+  </div>
+{% endblock content %}
+{% block javascript %}
+  <script>
+let currentPage = 1;
+
+async function fetchPosts(page = 1) {
+    try {
+    const response = await fetch(`/board/posts/?page=${page}`, {
+      headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}
+    });
+    if (response.ok) {
+      const data = await response.json();
+      renderPosts(data.results);
+      renderPagination(data);
+    } else {
+      throw new Error('게시글 불러오기 실패');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+function renderPosts(posts) {
+  const postList = document.getElementById('post-list');
+  postList.innerHTML = posts.map(post => `
+    <div class="post">
+      <h3>${post.title}</h3>
+      <p>${post.content.substring(0, 100)}...</p>
+      <a href="/board/posts/${post.id}/">자세히 보기</a>
+    </div>
+  `).join('');
+}
+
+function renderPagination(data) {
+  const prevButton = document.getElementById('prev-page');
+  const nextButton = document.getElementById('next-page');
+  const currentPageSpan = document.getElementById('current-page');
+
+  currentPageSpan.textContent = `${currentPage} / ${data.total_pages}`;
+  prevButton.disabled = currentPage === 1;
+  nextButton.disabled = currentPage === data.total_pages;
+}
+
+document.getElementById('prev-page').addEventListener('click', () => {
+  if (currentPage > 1) {
+    currentPage--;
+    fetchPosts(currentPage);
+  }
+});
+
+document.getElementById('next-page').addEventListener('click', () => {
+  currentPage++;
+  fetchPosts(currentPage);
+});
+
+fetchPosts();
+  </script>
+{% endblock javascript %}
