@@ -8,6 +8,19 @@ from .models import Post, Comment
 from authentication.models import BusinessMember
 from authentication.permissions import IsOwnerOrBusinessAdmin
 from django.utils import timezone
+from django.views.generic import TemplateView
+
+class BoardMainView(TemplateView):
+    template_name = 'boards/main.html'
+
+class PostCreateView(TemplateView):
+    template_name = 'boards/post_create.html'
+
+class MyPostListView(TemplateView):
+    template_name = 'boards/my_posts.html'
+
+class PostDetailView(TemplateView):
+    template_name = 'boards/post_detail.html'
 
 # 게시글 관리용 뷰셋
 class PostViewSet(viewsets.ModelViewSet):
