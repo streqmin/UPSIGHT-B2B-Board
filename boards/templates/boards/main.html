@@ -13,9 +13,9 @@
 let currentPage = 1;
 
 async function fetchPosts(page = 1) {
-    try {
-    const response = await fetch(`/board/posts/?page=${page}`, {
-      headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}
+  try {
+    const response = await fetch(`/api/board/posts/?page=${page}`, {
+      headers: { 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyNDM0OTgyLCJpYXQiOjE3MzI0MzQwODIsImp0aSI6ImUxN2M3NjAwZTZkZjRjM2RiYTczMjVjYTU1MTQxNTNiIiwidXNlcl9pZCI6Mn0.MAQdCp1-2-TrM544dEqwkBHqu90v1kS2zmOXfJWT65E` }
     });
     if (response.ok) {
       const data = await response.json();
@@ -34,7 +34,7 @@ function renderPosts(posts) {
   postList.innerHTML = posts.map(post => `
     <div class="post">
       <h3>${post.title}</h3>
-      <p>${post.content.substring(0, 100)}...</p>
+      <p>${post.content ? post.content.substring(0, 100) : ''}...</p>
       <a href="/board/posts/${post.id}/">자세히 보기</a>
     </div>
   `).join('');
@@ -45,9 +45,12 @@ function renderPagination(data) {
   const nextButton = document.getElementById('next-page');
   const currentPageSpan = document.getElementById('current-page');
 
-  currentPageSpan.textContent = `${currentPage} / ${data.total_pages}`;
-  prevButton.disabled = currentPage === 1;
-  nextButton.disabled = currentPage === data.total_pages;
+  const hasPrevious = !!data.previous;
+  const hasNext = !!data.next;
+
+  currentPageSpan.textContent = `페이지 ${currentPage}`;
+  prevButton.disabled = !hasPrevious;
+  nextButton.disabled = !hasNext;
 }
 
 document.getElementById('prev-page').addEventListener('click', () => {

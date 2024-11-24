@@ -13,27 +13,24 @@
             <nav>
                 <ul>
                     <li>
-                        <a href="/board/">홈</a>
-                    </li>
-                    <li>
-                        <a href="/board/posts/">게시판</a>
+                        <a href="{% url 'boards:board_main' %}">홈</a>
                     </li>
                     {% if user.is_authenticated %}
                         <li>
-                            <a href="/board/posts/my_posts/">내 게시글</a>
+                            <a href="{% url 'boards:my_posts' %}">내 게시글</a>
                         </li>
                         <li>
-                            <a href="/board/posts/create/">글쓰기</a>
+                            <a href="{% url 'boards:post_create' %}">글쓰기</a>
                         </li>
                         <li>
-                            <a href="/auth/logout/">로그아웃</a>
+                            {% comment %} <a href="/auth/logout/">로그아웃</a> {% endcomment %}
                         </li>
                     {% else %}
                         <li>
-                            <a href="/login/">로그인</a>
+                            <a href="{% url 'authentication:login' %}">로그인</a>
                         </li>
                         <li>
-                            <a href="/register/">회원가입</a>
+                            <a href="{% url 'authentication:register' %}">회원가입</a>
                         </li>
                     {% endif %}
                 </ul>
