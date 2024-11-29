@@ -5,6 +5,12 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .serializers import RegisterSerializer, BusinessSerializer
 from .models import Business, BusinessMember
 from authentication.permissions import IsBusinessAdmin
+from django.views.generic import TemplateView
+
+class RegisterView(TemplateView):
+    template_name = 'authentication/register.html'
+class LoginView(TemplateView):
+    template_name = 'authentication/login.html'
 
 # JWT를 쿠키에 넣는 커스텀 로그인 뷰
 class CustomTokenObtainPairView(TokenObtainPairView):

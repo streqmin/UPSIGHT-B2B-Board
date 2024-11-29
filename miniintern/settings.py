@@ -52,7 +52,7 @@ ROOT_URLCONF = 'miniintern.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -81,6 +81,7 @@ DATABASES = {
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'authentication.backends.CookieJWTAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
@@ -101,6 +102,11 @@ SWAGGER_SETTINGS = {
         }
     }
 }
+
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+
+CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
@@ -146,14 +152,11 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_TZ = True
-
+LANGUAGE_CODE = 'ko-kr'  # 한국어로 설정
+TIME_ZONE = 'Asia/Seoul'  # 한국 시간대 설정
+USE_I18N = True  # 국제화 기능 활성화
+USE_L10N = True  # 지역화 기능 활성화
+USE_TZ = True  # 시간대 사용 활성화
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/

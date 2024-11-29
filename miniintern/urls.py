@@ -19,6 +19,9 @@ urlpatterns = [
     path('api/board/', include('boards.urls')),
     path('api/auth/', include('authentication.urls')),
     
+    path('auth/', include('authentication.template_urls')),
+    path('board/', include('boards.template_urls')),
+    
     # API 문서화
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
