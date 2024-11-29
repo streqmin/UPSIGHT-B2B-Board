@@ -15,19 +15,28 @@ let currentPage = 1;
 async function fetchPosts(page = 1) {
   try {
     const response = await fetch(`/api/board/posts/?page=${page}`, {
-      headers: { 'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyNDM0OTgyLCJpYXQiOjE3MzI0MzQwODIsImp0aSI6ImUxN2M3NjAwZTZkZjRjM2RiYTczMjVjYTU1MTQxNTNiIiwidXNlcl9pZCI6Mn0.MAQdCp1-2-TrM544dEqwkBHqu90v1kS2zmOXfJWT65E` }
+      method: 'GET',
+      credentials: 'include', // 쿠키 포함
+      headers: {
+        'Content-Type': 'application/json'
+      }
     });
+
     if (response.ok) {
       const data = await response.json();
       renderPosts(data.results);
       renderPagination(data);
+    } else if (response.status === 401) {
+      throw new Error('인증 실패: 로그인 상태를 확인해주세요.');
     } else {
       throw new Error('게시글 불러오기 실패');
     }
   } catch (error) {
     console.error('Error:', error);
+    alert(error.message);
   }
 }
+
 
 function renderPosts(posts) {
   const postList = document.getElementById('post-list');
