@@ -7,9 +7,9 @@ from .models import Business, BusinessMember
 from authentication.permissions import IsBusinessAdmin
 from django.views.generic import TemplateView
 
-class RegisterView(TemplateView):
+class RegisterTemplateView(TemplateView):
     template_name = 'authentication/register.html'
-class LoginView(TemplateView):
+class LoginTemplateView(TemplateView):
     template_name = 'authentication/login.html'
 
 # JWT를 쿠키에 넣는 커스텀 로그인 뷰

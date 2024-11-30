@@ -34,6 +34,7 @@ class PostViewSet(viewsets.ModelViewSet):
     filterset_fields = ['is_public']
     search_fields = ['title', 'content']
     ordering_fields = ['created_at', 'title']
+    ordering = ['-created_at']
 
     def get_queryset(self):
         """
@@ -90,6 +91,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     filterset_fields = ['post', 'is_public']
     search_fields = ['content']
     ordering_fields = ['created_at']
+    ordering = ['-created_at']
 
     def get_queryset(self):
         """
