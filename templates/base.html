@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="keywords" content="board" />
+        <meta name="description"
+              content="sean's board project with Django, Django template" />
+        <title>UPSIGHT 게시판</title>
+        <!-- CSS -->
+        <link rel="stylesheet" href="{% static 'css/base.css' %}">
+        {% block css %}
+        {% endblock css %}
+    </head>
+    <body>
+        <header>
+            <nav>
+                <ul>
+                    <li>
+                        <a href="{% url 'boards:board_main' %}">홈</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li>
+                            <a href="{% url 'boards:my_posts' %}">내 게시글</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'boards:post_create' %}">글쓰기</a>
+                        </li>
+                        <li>
+                            {% comment %} <a href="/auth/logout/">로그아웃</a> {% endcomment %}
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href="{% url 'authentication:login' %}">로그인</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'authentication:register' %}">회원가입</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </header>
+        <main>
+            {% block content %}
+            {% endblock content %}
+        </main>
+        <footer>
+            <p>© 2024 UPSIGHT 게시판</p>
+        </footer>
+        <!-- JavaScript -->
+        <script src="{% static 'js/base.js' %}"></script>
+        {% block javascript %}
+        {% endblock javascript %}
+    </body>
+</html>

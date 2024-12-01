@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>게시판</h2>
+  <div id="post-list"></div>
+  <div id="pagination">
+    <button id="prev-page">&lt;</button>
+    <span id="current-page"></span>
+    <button id="next-page">&gt;</button>
+  </div>
+{% endblock content %}
+{% block javascript %}
+  <script>
+let currentPage = 1;
+
+async function fetchPosts(page = 1) {
+  try {
+    const response = await fetch(`/api/board/posts/?page=${page}`, {
+      method: 'GET',
+      credentials: 'include', // 쿠키 포함
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      renderPosts(data.results);
+      renderPagination(data);
+    } else if (response.status === 401) {
+      throw new Error('인증 실패: 로그인 상태를 확인해주세요.');
+    } else {
+      throw new Error('게시글 불러오기 실패');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert(error.message);
+  }
+}
+
+
+function renderPosts(posts) {
+  const postList = document.getElementById('post-list');
+  postList.innerHTML = posts.map(post => `
+    <div class="post">
+      <h3>${post.title}</h3>
+      <p>${post.content ? post.content.substring(0, 100) : ''}...</p>
+      <a href="/board/posts/${post.id}/">자세히 보기</a>
+    </div>
+  `).join('');
+}
+
+function renderPagination(data) {
+  const prevButton = document.getElementById('prev-page');
+  const nextButton = document.getElementById('next-page');
+  const currentPageSpan = document.getElementById('current-page');
+
+  const hasPrevious = !!data.previous;
+  const hasNext = !!data.next;
+
+  currentPageSpan.textContent = `페이지 ${currentPage}`;
+  prevButton.disabled = !hasPrevious;
+  nextButton.disabled = !hasNext;
+}
+
+document.getElementById('prev-page').addEventListener('click', () => {
+  if (currentPage > 1) {
+    currentPage--;
+    fetchPosts(currentPage);
+  }
+});
+
+document.getElementById('next-page').addEventListener('click', () => {
+  currentPage++;
+  fetchPosts(currentPage);
+});
+
+fetchPosts();
+  </script>
+{% endblock javascript %}
