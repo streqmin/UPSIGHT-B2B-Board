@@ -5,6 +5,12 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .serializers import RegisterSerializer, BusinessSerializer
 from .models import Business, BusinessMember
 from authentication.permissions import IsBusinessAdmin
+from django.views.generic import TemplateView
+
+class RegisterTemplateView(TemplateView):
+    template_name = 'authentication/register.html'
+class LoginTemplateView(TemplateView):
+    template_name = 'authentication/login.html'
 
 # JWT를 쿠키에 넣는 커스텀 로그인 뷰
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -75,8 +81,14 @@ class BusinessViewSet(viewsets.ModelViewSet):
     """
     queryset = Business.objects.all()
     serializer_class = BusinessSerializer
-    permission_classes = [permissions.IsAuthenticated, IsBusinessAdmin]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['name']
     search_fields = ['name', 'address', 'phone_number', 'website']
     ordering_fields = ['name']
+    
+    def get_permissions(self):
+        if self.action == 'list':
+            permission_classes = [permissions.AllowAny]
+        else:
+            permission_classes = [IsBusinessAdmin]
+        return [permission() for permission in permission_classes]
