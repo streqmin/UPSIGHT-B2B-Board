@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock css %}
+{% block content %}
+    <div class="container">
+        <div class="hero">
+            <form id="login-form" class="form" action="">
+                {% csrf_token %}
+                <div class="logo">B2B Board</div>
+                <input type="text"
+                       name="username"
+                       id="username"
+                       class="input"
+                       placeholder="Username"
+                       required>
+                <input type="password"
+                       name="password"
+                       id="password"
+                       class="input"
+                       placeholder="Password"
+                       required>
+                <input type="submit" value="Log in" class="input submit">
+                <p class="signup">
+                    Don't have an account ? <a href="#">SignUp</a>
+                </p>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async function (event) {
+            event.preventDefault(); // 기본 폼 제출 방지
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            try {
+                const response = await fetch("{% url 'token_obtain_pair' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ username, password }),
+                    credentials: 'include' // 쿠키 포함
+                });
+
+                if (response.ok) {
+                    // 로그인 성공 시 main.html로 리다이렉트
+                    window.location.href = "{% url 'boards:board_main' %}";
+                } else {
+                    // 에러 메시지 표시
+                    const data = await response.json();
+                    const errorMessage = document.getElementById('error-message');
+                    errorMessage.textContent = data.detail || '로그인에 실패했습니다.';
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error during login:', error);
+                alert('알 수 없는 오류가 발생했습니다. 다시 시도해주세요.');
+            }
+        });
+    </script>
+{% endblock content %}

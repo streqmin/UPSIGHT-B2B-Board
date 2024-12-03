@@ -37,6 +37,8 @@ pip install Faker
 pip install pytest-cov
 # Postgresql ...
 pip install psycopg2-binary
+# Django template
+pip install djlint
 ```
 
 ## 🏗️ Django 프로젝트 구조
