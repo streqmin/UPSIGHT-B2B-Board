@@ -17,7 +17,7 @@ class PostCreateView(TemplateView):
     template_name = 'boards/post_create.html'
 
 class MyPostListView(TemplateView):
-    template_name = 'boards/my_posts.html'
+    template_name = 'boards/my_post.html'
 
 class PostDetailView(TemplateView):
     template_name = 'boards/post_detail.html'
