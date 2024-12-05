@@ -1,0 +1,82 @@
+/* main.css 또는 <style> 태그 내에 추가 */
+
+/* 전체 레이아웃 설정 */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+h2 {
+    text-align: center;
+}
+
+/* 포스트 목록 컨테이너 */
+#post-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* 각 포스트 아이템 */
+.post {
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+/* 포스트 제목 */
+.post h3 {
+    margin: 0 0 10px;
+    font-size: 1.5em;
+}
+
+/* 포스트 내용 */
+.post p {
+    color: #555;
+    margin: 0 0 10px;
+}
+
+/* '자세히 보기' 링크 */
+.post a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.post a:hover {
+    text-decoration: underline;
+}
+
+/* 페이지네이션 컨테이너 */
+#pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+/* 페이지네이션 버튼 */
+#pagination button {
+    padding: 8px 12px;
+    margin: 0 10px;
+    font-size: 16px;
+    border: none;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#pagination button:disabled {
+    background-color: #e0e0e0;
+    color: #999;
+    cursor: not-allowed;
+}
+
+/* 현재 페이지 표시 */
+#current-page {
+    font-size: 16px;
+    font-weight: bold;
+}
