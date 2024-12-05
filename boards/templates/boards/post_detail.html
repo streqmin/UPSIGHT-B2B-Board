@@ -1,7 +1,14 @@
 {% extends "base.html" %}
+{% load static %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/post-detail.css' %}">
+{% endblock css %}
 {% block content %}
-  <h2 id="post-title"></h2>
-  <div id="post-content"></div>
+  <div id="post-container">
+    <h2 id="post-title"></h2>
+    <div id="post-content"></div>
+  </div>
+  <div id="error-message"></div>
 {% endblock content %}
 {% block javascript %}
   <script>
