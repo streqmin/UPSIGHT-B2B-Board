@@ -1,4 +1,8 @@
 {% extends "base.html" %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/register.css' %}">
+{% endblock css %}
 {% block content %}
     <h2>회원가입</h2>
     <form id="register-form">
