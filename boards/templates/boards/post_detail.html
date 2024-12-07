@@ -12,13 +12,22 @@
     <div id="post-content"></div>
   </div>
   <div id="error-message"></div>
+  <!-- Edit 버튼 -->
+  <button id="edit-button" style="display:none;" onclick="enableEditMode()">Edit</button>
+  <button id="save-button" style="display:none;" onclick="savePost()">Save</button>
+  <div id="edit-form" style="display:none;">
+    <input type="text" id="edit-title" />
+    <textarea id="edit-content"></textarea>
+  </div>
 {% endblock content %}
 {% block javascript %}
   <script>
+    let post = null;  // 게시글 데이터를 저장할 변수
+    let isEditing = false;  // 수정 상태를 나타내는 변수
+
     // URL에서 게시글 ID를 추출하는 함수
     function getPostIdFromURL() {
       const urlParts = window.location.pathname.split('/');
-      // URL 형식: /board/posts/{post_id}/
       const postId = urlParts[urlParts.length - 2]; // 마지막 요소는 빈 문자열이므로 -2 사용
       return postId;
     }
@@ -28,19 +37,15 @@
       try {
         const response = await fetch(`/api/board/posts/${postId}/`, {
           method: 'GET',
-          credentials: 'include', // 쿠키 포함
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json'
           }
         });
 
         if (response.ok) {
-          const post = await response.json();
+          post = await response.json();
           renderPost(post);
-        } else if (response.status === 401) {
-          throw new Error('인증 실패: 로그인 상태를 확인해주세요.');
-        } else if (response.status === 404) {
-          throw new Error('게시글을 찾을 수 없습니다.');
         } else {
           throw new Error('게시글 불러오기 실패');
         }
@@ -55,18 +60,72 @@
       const contentElement = document.getElementById('post-content');
       const authorElement = document.getElementById('post-author');
       const createdAtElement = document.getElementById('post-created-at');
-    
+      const editButton = document.getElementById('edit-button');
+
       titleElement.textContent = post.title;
-      contentElement.innerHTML = post.content; // HTML 포함 가능성 있으므로 innerHTML 사용
-    
-      // 작성자 표시
+      contentElement.innerHTML = post.content;
       authorElement.textContent = `작성자: ${post.author}`;
-    
-      // 작성일 표시 (날짜 포맷 변환)
       const createdDate = new Date(post.created_at);
       createdAtElement.textContent = `작성일: ${createdDate.toLocaleString()}`;
+
+      // 로그인한 사용자와 게시글 작성자가 일치하면 Edit 버튼을 표시
+      if (post.author === "{{ user.username }}") {
+        editButton.style.display = 'inline-block';
+      }
     }
-    
+
+    function enableEditMode() {
+      isEditing = true;
+
+      // Edit 모드로 변경
+      document.getElementById('edit-title').value = post.title;
+      document.getElementById('edit-content').value = post.content;
+      document.getElementById('edit-form').style.display = 'block';
+      document.getElementById('save-button').style.display = 'inline-block';
+      document.getElementById('post-title').style.display = 'none';
+      document.getElementById('post-content').style.display = 'none';
+      document.getElementById('edit-button').style.display = 'none';
+    }
+
+    async function savePost() {
+      const postId = getPostIdFromURL();
+      const updatedPost = {
+        title: document.getElementById('edit-title').value,
+        content: document.getElementById('edit-content').value,
+      };
+
+      try {
+        const response = await fetch("{% url 'post-detail' 'post_id' %}".replace('post_id', postId), {
+          method: 'PATCH',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(updatedPost)
+        });
+
+        if (response.ok) {
+          const updatedPostData = await response.json();
+          post = updatedPostData;
+          renderPost(post);
+          cancelEditMode();
+        } else {
+          throw new Error('게시글 수정 실패');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert(error.message);
+      }
+    }
+
+    function cancelEditMode() {
+      isEditing = false;
+      document.getElementById('edit-form').style.display = 'none';
+      document.getElementById('save-button').style.display = 'none';
+      document.getElementById('post-title').style.display = 'block';
+      document.getElementById('post-content').style.display = 'block';
+      document.getElementById('edit-button').style.display = 'inline-block';
+    }
 
     // 페이지 로드 시 게시글 데이터 가져오기
     fetchPost();
