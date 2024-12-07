@@ -48,7 +48,6 @@
                 });
 
                 if (response.ok) {
-                    // 로그인 성공 시 main.html로 리다이렉트
                     window.location.href = "{% url 'boards:board_main' %}";
                 } else {
                     // 에러 메시지 표시
