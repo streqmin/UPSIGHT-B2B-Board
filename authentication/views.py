@@ -1,6 +1,6 @@
 from rest_framework import generics, viewsets, permissions, filters
 from rest_framework.response import Response
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenBlacklistView
 from django_filters.rest_framework import DjangoFilterBackend
 from .serializers import RegisterSerializer, BusinessSerializer
 from .models import Business, BusinessMember
@@ -61,7 +61,11 @@ class CustomTokenRefreshView(TokenRefreshView):
             )
         return response
 
-
+class LogoutView(TokenBlacklistView):
+    """
+    SimpleJWT의 TokenBlacklistView를 상속하여 로그아웃 기능 구현.
+    """
+    permission_classes = [permissions.IsAuthenticated]
 
 # 사용자 등록을 위한 뷰
 class RegisterView(generics.CreateAPIView):
