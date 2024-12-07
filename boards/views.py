@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.views.generic import TemplateView
 
 class BoardMainView(TemplateView):
-    template_name = 'boards/main.html'
+    template_name = 'boards/home.html'
 
 class PostCreateView(TemplateView):
     template_name = 'boards/post_create.html'
