@@ -28,7 +28,10 @@
                             <a href="{% url 'boards:post_create' %}">글쓰기</a>
                         </li>
                         <li>
-                            {% comment %} <a href="/auth/logout/">로그아웃</a> {% endcomment %}
+                            <a href="#"
+                               id="logout-button"
+                               data-logout-url="{% url 'logout' %}"
+                               data-login-url="{% url 'authentication:login' %}">로그아웃</a>
                         </li>
                     {% else %}
                         <li>
