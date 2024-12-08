@@ -2,6 +2,7 @@ from rest_framework import generics, viewsets, permissions, filters, status
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenBlacklistView
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
 from django_filters.rest_framework import DjangoFilterBackend
 from .serializers import RegisterSerializer, BusinessSerializer
 from .models import Business, BusinessMember
@@ -74,9 +75,10 @@ class LogoutView(TokenBlacklistView):
             return Response({"detail": "Refresh token is required."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # RefreshToken 유효성 검사 및 블랙리스트 추가
             token = RefreshToken(refresh_token)
             token.blacklist()
+        except TokenError as e:
+            return Response({"detail": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
