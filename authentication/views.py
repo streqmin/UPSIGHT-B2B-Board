@@ -1,5 +1,5 @@
 from django.views.generic import TemplateView
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from rest_framework import generics, viewsets, permissions, filters, status
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
@@ -96,11 +96,12 @@ class LogoutView(TokenBlacklistView):
         except Exception as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+        logout(request)
+        
         # 쿠키 삭제
         response = Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
         response.delete_cookie('refresh_token')
         response.delete_cookie('access_token')
-        request.session.flush()
         return response
 
 # 사용자 등록을 위한 뷰
