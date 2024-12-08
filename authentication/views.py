@@ -1,6 +1,7 @@
-from rest_framework import generics, viewsets, permissions, filters
+from rest_framework import generics, viewsets, permissions, filters, status
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenBlacklistView
+from rest_framework_simplejwt.tokens import RefreshToken
 from django_filters.rest_framework import DjangoFilterBackend
 from .serializers import RegisterSerializer, BusinessSerializer
 from .models import Business, BusinessMember
@@ -65,7 +66,25 @@ class LogoutView(TokenBlacklistView):
     """
     SimpleJWT의 TokenBlacklistView를 상속하여 로그아웃 기능 구현.
     """
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = []
+    def post(self, request, *args, **kwargs):
+        # 쿠키에서 refresh_token 가져오기
+        refresh_token = request.COOKIES.get('refresh_token')
+        if not refresh_token:
+            return Response({"detail": "Refresh token is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # RefreshToken 유효성 검사 및 블랙리스트 추가
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 쿠키 삭제
+        response = Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
+        response.delete_cookie('refresh_token')
+        response.delete_cookie('access_token')
+        return response
 
 # 사용자 등록을 위한 뷰
 class RegisterView(generics.CreateAPIView):
