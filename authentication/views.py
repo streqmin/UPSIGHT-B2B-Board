@@ -1,5 +1,8 @@
+from django.views.generic import TemplateView
+from django.contrib.auth import authenticate, login
 from rest_framework import generics, viewsets, permissions, filters, status
 from rest_framework.response import Response
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenBlacklistView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
@@ -7,7 +10,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .serializers import RegisterSerializer, BusinessSerializer
 from .models import Business, BusinessMember
 from authentication.permissions import IsBusinessAdmin
-from django.views.generic import TemplateView
+
 
 class RegisterTemplateView(TemplateView):
     template_name = 'authentication/register.html'
@@ -17,6 +20,17 @@ class LoginTemplateView(TemplateView):
 # JWT를 쿠키에 넣는 커스텀 로그인 뷰
 class CustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
+        # 사용자 인증
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        user = authenticate(request, username=username, password=password)
+        if user is None:
+            raise AuthenticationFailed('Invalid username or password.')
+
+        # Django 세션 로그인 (원한다면 추가)
+        login(request, user)
+
         # 기본 JWT 발급 로직 실행
         response = super().post(request, *args, **kwargs)
         data = response.data
@@ -86,6 +100,7 @@ class LogoutView(TokenBlacklistView):
         response = Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
         response.delete_cookie('refresh_token')
         response.delete_cookie('access_token')
+        request.session.flush()
         return response
 
 # 사용자 등록을 위한 뷰
