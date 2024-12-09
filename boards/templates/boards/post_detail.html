@@ -11,19 +11,19 @@
     <div id="post-meta">
       <span id="post-author"></span> | <span id="post-created-at"></span>
     </div>
+    <!-- Edit 버튼 -->
+    <button id="edit-button" onclick="enableEditMode()">Edit</button>
+    <button id="save-button" onclick="savePost()">Save</button>
+    <div id="edit-form">
+      <input type="text" id="edit-title" />
+      <textarea id="edit-content"></textarea>
+    </div>
+    <!-- 삭제 버튼 -->
+    <button id="delete-button" onclick="confirmDelete()">Delete</button>
+    <!-- 댓글 영역 -->
     <div id="post-content"></div>
   </div>
   <div id="error-message"></div>
-  <!-- Edit 버튼 -->
-  <button id="edit-button" onclick="enableEditMode()">Edit</button>
-  <button id="save-button" onclick="savePost()">Save</button>
-  <div id="edit-form">
-    <input type="text" id="edit-title" />
-    <textarea id="edit-content"></textarea>
-  </div>
-  <!-- 삭제 버튼 -->
-  <button id="delete-button" onclick="confirmDelete()">Delete</button>
-  <!-- 댓글 영역 -->
   <div id="comments-container">
     <h3>댓글</h3>
     <ul id="comment-list">
