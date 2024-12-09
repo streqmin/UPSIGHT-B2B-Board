@@ -3,6 +3,7 @@
 {% block css %}
   <link rel="stylesheet" href="{% static 'css/post-detail.css' %}">
   <link rel="stylesheet" href="{% static 'css/post-detail-id.css' %}">
+  <link rel="stylesheet" href="{% static 'css/post-detail-comment.css' %}">
 {% endblock css %}
 {% block content %}
   <div id="post-container">
@@ -218,8 +219,8 @@ async function deletePost() {
         <span>작성자: ${comment.author}</span>
         ${
           comment.author === "{{ user.username }}" || "{{ user.role }}" === "BUSINESS_ADMIN"
-            ? `<button onclick="editComment(${comment.id})">수정</button>
-               <button onclick="deleteComment(${comment.id})">삭제</button>`
+            ? `<button class="comment-edit-button" onclick="editComment(${comment.id})">수정</button>
+               <button class="comment-delete-button" onclick="deleteComment(${comment.id})">삭제</button>`
             : ''
         }
       `;

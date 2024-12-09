@@ -30,3 +30,10 @@
     margin-top: 20px;
     font-weight: bold;
 }
+
+#edit-button,
+#save-button,
+#edit-form,
+#delete-button {
+    display: none;
+}
