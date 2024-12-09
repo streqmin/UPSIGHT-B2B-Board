@@ -2,6 +2,7 @@
 {% load static %}
 {% block css %}
   <link rel="stylesheet" href="{% static 'css/post-detail.css' %}">
+  <link rel="stylesheet" href="{% static 'css/post-detail-id.css' %}">
 {% endblock css %}
 {% block content %}
   <div id="post-container">
@@ -13,14 +14,14 @@
   </div>
   <div id="error-message"></div>
   <!-- Edit 버튼 -->
-  <button id="edit-button" style="display:none;" onclick="enableEditMode()">Edit</button>
-  <button id="save-button" style="display:none;" onclick="savePost()">Save</button>
-  <div id="edit-form" style="display:none;">
+  <button id="edit-button" onclick="enableEditMode()">Edit</button>
+  <button id="save-button" onclick="savePost()">Save</button>
+  <div id="edit-form">
     <input type="text" id="edit-title" />
     <textarea id="edit-content"></textarea>
   </div>
   <!-- 삭제 버튼 -->
-  <button id="delete-button" style="display:none;" onclick="confirmDelete()">Delete</button>
+  <button id="delete-button" onclick="confirmDelete()">Delete</button>
   <!-- 댓글 영역 -->
   <div id="comments-container">
     <h3>댓글</h3>
