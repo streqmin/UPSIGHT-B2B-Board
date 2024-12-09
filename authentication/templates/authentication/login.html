@@ -4,30 +4,26 @@
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
 {% endblock css %}
 {% block content %}
-    <div class="container">
-        <div class="hero">
-            <form id="login-form" class="form" action="">
-                {% csrf_token %}
-                <div class="logo">B2B Board</div>
-                <input type="text"
-                       name="username"
-                       id="username"
-                       class="input"
-                       placeholder="Username"
-                       required>
-                <input type="password"
-                       name="password"
-                       id="password"
-                       class="input"
-                       placeholder="Password"
-                       required>
-                <input type="submit" value="Log in" class="input submit">
-                <p class="signup">
-                    Don't have an account ? <a href="#">SignUp</a>
-                </p>
-            </form>
-        </div>
-    </div>
+    <h2>B2B Board</h2>
+    <form id="login-form" class="form" action="">
+        {% csrf_token %}
+        <input type="text"
+               name="username"
+               id="username"
+               class="input"
+               placeholder="Username"
+               required>
+        <input type="password"
+               name="password"
+               id="password"
+               class="input"
+               placeholder="Password"
+               required>
+        <input type="submit" value="Log in" class="input submit">
+        <p class="signup">
+            Don't have an account ? <a href="{% url 'authentication:register' %}">SignUp</a>
+        </p>
+    </form>
 {% endblock content %}
 {% block javascript %}
     <script>
