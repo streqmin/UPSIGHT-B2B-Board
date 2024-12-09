@@ -1,81 +1,94 @@
+/* 컨테이너 스타일 */
 .container {
-    height: 100%;
     width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
-.hero {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #f7f7f7;
+/* 로고 스타일 */
+.logo {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
 }
 
+/* 폼 스타일 */
 .form {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
+    gap: 15px;
 }
 
+/* 입력 필드 스타일 */
 .input {
-    padding: 1rem 1.2rem;
-    margin: 1rem;
-    border-radius: 2rem;
-    display: block;
-    width: 80%;
-    border: none;
-    box-shadow: inset 6px 6px 8px rgba(97, 97, 97, 0.075),
-        6px 6px 6px rgba(255, 255, 255, 0.781);
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+
+.input:focus {
     outline: none;
-    background-color: inherit;
-    color: rgb(161, 161, 161);
-    font-size: inherit;
+    border-color: #4caf50;
+    box-shadow: 0 0 4px rgba(76, 175, 80, 0.2);
 }
 
-.submit,
-.btn {
-    margin-top: 20px;
+/* 제출 버튼 스타일 */
+.input.submit {
+    background-color: #4caf50;
+    color: white;
+    font-size: 16px;
     font-weight: bold;
-    box-shadow: -3px -3px 5px white, 3px 3px 5px rgba(209, 209, 209, 0.705);
-    color: rgb(112, 112, 112);
+    border: none;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-.btn {
-    text-align: center;
-    color: black;
+.input.submit:hover {
+    background-color: #45a049;
 }
 
-.logo {
-    font-size: 3rem;
-    color: black;
-    font-weight: 600;
-    margin: 30px;
-}
-
-::placeholder {
-    color: rgb(161, 161, 161);
-}
-
-.forgotten {
-    text-align: center;
-    font-size: 0.8rem;
-    width: 80%;
-    color: gray;
-    margin: 15px 0;
-}
-
-a {
-    color: inherit;
-    font-weight: bold;
-    text-decoration: none;
-}
-
+/* 회원가입 링크 스타일 */
 .signup {
-    color: gray;
-    margin-top: 15px;
-    font-size: 1rem;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #555;
+}
+
+.signup a {
+    text-decoration: none;
+    color: #4caf50;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.signup a:hover {
+    color: #45a049;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 480px) {
+    .container {
+        padding: 15px;
+    }
+
+    .logo {
+        font-size: 1.5rem;
+    }
+
+    .input {
+        font-size: 13px;
+    }
+
+    .input.submit {
+        font-size: 14px;
+    }
 }

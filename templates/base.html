@@ -9,6 +9,7 @@
               content="sean's board project with Django, Django template" />
         <title>UPSIGHT 게시판</title>
         <!-- CSS -->
+        <link rel="stylesheet" href="{% static 'css/reset.css' %}">
         <link rel="stylesheet" href="{% static 'css/base.css' %}">
         {% block css %}
         {% endblock css %}
@@ -44,7 +45,7 @@
                 </ul>
             </nav>
         </header>
-        <main>
+        <main id="base-content">
             {% block content %}
             {% endblock content %}
         </main>

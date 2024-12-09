@@ -1,15 +1,3 @@
-/* 기본 스타일 초기화 */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
-
 h2 {
     text-align: center;
     color: #333;
@@ -77,21 +65,4 @@ form#register-form button[type="submit"]:hover {
     font-size: 14px;
     margin-top: 10px;
     display: none;
-}
-
-/* 반응형 디자인 */
-@media (max-width: 480px) {
-    form#register-form {
-        padding: 15px;
-    }
-
-    form#register-form input,
-    form#register-form select {
-        font-size: 12px;
-        padding: 8px;
-    }
-
-    form#register-form button[type="submit"] {
-        font-size: 14px;
-    }
 }
