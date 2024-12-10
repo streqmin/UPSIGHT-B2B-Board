@@ -2,26 +2,26 @@
 {% load static %}
 {% block css %}
   <link rel="stylesheet" href="{% static 'css/post-detail.css' %}">
+  <link rel="stylesheet" href="{% static 'css/post-detail-id.css' %}">
+  <link rel="stylesheet" href="{% static 'css/post-detail-comment.css' %}">
 {% endblock css %}
 {% block content %}
   <div id="post-container">
     <h2 id="post-title"></h2>
+    <input type="text" id="edit-title" />
     <div id="post-meta">
       <span id="post-author"></span> | <span id="post-created-at"></span>
     </div>
+    <!-- Edit 버튼 -->
+    <button id="edit-button" onclick="enableEditMode()">Edit</button>
+    <button id="save-button" onclick="savePost()">Save</button>
+    <!-- 삭제 버튼 -->
+    <button id="delete-button" onclick="confirmDelete()">Delete</button>
+    <!-- 댓글 영역 -->
     <div id="post-content"></div>
-  </div>
-  <div id="error-message"></div>
-  <!-- Edit 버튼 -->
-  <button id="edit-button" style="display:none;" onclick="enableEditMode()">Edit</button>
-  <button id="save-button" style="display:none;" onclick="savePost()">Save</button>
-  <div id="edit-form" style="display:none;">
-    <input type="text" id="edit-title" />
     <textarea id="edit-content"></textarea>
   </div>
-  <!-- 삭제 버튼 -->
-  <button id="delete-button" style="display:none;" onclick="confirmDelete()">Delete</button>
-  <!-- 댓글 영역 -->
+  <div id="error-message"></div>
   <div id="comments-container">
     <h3>댓글</h3>
     <ul id="comment-list">
@@ -99,7 +99,8 @@
       // Edit 모드로 변경
       document.getElementById('edit-title').value = post.title;
       document.getElementById('edit-content').value = post.content;
-      document.getElementById('edit-form').style.display = 'block';
+      document.getElementById('edit-title').style.display = 'block';
+      document.getElementById('edit-content').style.display = 'block';
       document.getElementById('save-button').style.display = 'inline-block';
       document.getElementById('post-title').style.display = 'none';
       document.getElementById('post-content').style.display = 'none';
@@ -141,10 +142,11 @@
 
     function cancelEditMode() {
       isEditing = false;
-      document.getElementById('edit-form').style.display = 'none';
       document.getElementById('save-button').style.display = 'none';
       document.getElementById('post-title').style.display = 'block';
       document.getElementById('post-content').style.display = 'block';
+      document.getElementById('edit-title').style.display = 'none';
+      document.getElementById('edit-content').style.display = 'none';
       document.getElementById('edit-button').style.display = 'inline-block';
     }
 
@@ -217,8 +219,8 @@ async function deletePost() {
         <span>작성자: ${comment.author}</span>
         ${
           comment.author === "{{ user.username }}" || "{{ user.role }}" === "BUSINESS_ADMIN"
-            ? `<button onclick="editComment(${comment.id})">수정</button>
-               <button onclick="deleteComment(${comment.id})">삭제</button>`
+            ? `<button class="comment-edit-button" onclick="editComment(${comment.id})">수정</button>
+               <button class="comment-delete-button" onclick="deleteComment(${comment.id})">삭제</button>`
             : ''
         }
       `;
