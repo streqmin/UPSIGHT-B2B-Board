@@ -21,6 +21,7 @@ h2 {
     font-weight: bold;
     color: #333;
     margin-bottom: 20px;
+    text-align: center;
 }
 
 header nav ul {
@@ -73,5 +74,5 @@ footer {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
 }

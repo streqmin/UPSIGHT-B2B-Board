@@ -1,5 +1,5 @@
 /* 게시글 컨테이너 */
-#post-container {
+#post-create-container {
     width: 90%;
     margin: 0 auto;
     padding: 30px;
@@ -8,9 +8,7 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-/* 게시글 제목 */
-#post-title,
-#edit-title {
+#title {
     font-size: 2.5em;
     margin-bottom: 20px;
     text-align: center;
@@ -24,20 +22,18 @@
     line-height: normal;
 }
 
-#edit-title {
+#title {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    display: none;
+    /* display: none; */
     padding: 0;
     border: 1px solid #ccc;
     border-radius: 4px;
     font-weight: bold;
 }
 
-/* 게시글 내용 */
-#post-content,
-#edit-content {
+#content {
     padding: 5px;
     font-family: inherit;
     font-size: 1.2em;
@@ -47,8 +43,8 @@
     box-sizing: border-box;
 }
 
-#edit-content {
-    display: none;
+#content {
+    /* display: none; */
     height: 250px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -58,18 +54,10 @@
     color: #333;
 }
 
-/* 에러 메시지 */
-#error-message {
-    color: red;
-    text-align: center;
-    margin-top: 20px;
-    font-weight: bold;
-}
-
 #edit-button,
 #save-button,
 #delete-button {
-    display: none;
+    /* display: none; */
     padding: 5px 10px;
     font-size: 0.9rem;
     color: #ffffff;
