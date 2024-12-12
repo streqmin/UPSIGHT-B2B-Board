@@ -126,6 +126,7 @@ class BusinessViewSet(viewsets.ModelViewSet):
     filterset_fields = ['name']
     search_fields = ['name', 'address', 'phone_number', 'website']
     ordering_fields = ['name']
+    ordering = ['name']
     
     def get_permissions(self):
         if self.action == 'list':
