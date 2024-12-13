@@ -1,5 +1,6 @@
 /* 게시글 컨테이너 */
 #post-container {
+    position: relative;
     width: 90%;
     margin: 0 auto;
     padding: 30px;
@@ -89,4 +90,17 @@
 
 #delete-button {
     background-color: #f44336;
+}
+
+#deleted {
+    position: absolute;
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    background-color: #f44336;
+
+    text-transform: uppercase;
 }

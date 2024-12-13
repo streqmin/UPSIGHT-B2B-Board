@@ -7,6 +7,7 @@
 {% endblock css %}
 {% block content %}
   <div id="post-container">
+    <span id="deleted"></span>
     <h2 id="post-title"></h2>
     <input type="text" id="edit-title" />
     <div id="post-meta">
@@ -69,13 +70,18 @@
     }
 
     function renderPost(post) {
+      const deletedMark = document.getElementById('deleted');
       const titleElement = document.getElementById('post-title');
       const contentElement = document.getElementById('post-content');
       const authorElement = document.getElementById('post-author');
       const createdAtElement = document.getElementById('post-created-at');
       const editButton = document.getElementById('edit-button');
       const deleteButton = document.getElementById('delete-button');
+      console.log('post.deleted_at');
+      console.log(post.deleted_at);
+      console.log(post.deleted_at ? true : false);
 
+      deletedMark.innerHTML = post.deleted_at ? 'deleted' : '';
       titleElement.textContent = post.title;
       contentElement.innerHTML = post.content;
       authorElement.textContent = `작성자: ${post.author}`;
