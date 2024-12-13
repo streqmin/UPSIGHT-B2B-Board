@@ -21,6 +21,11 @@
     margin: 0;
 }
 
+#comment-list .deleted {
+    position: relative;
+    display: inline-block;
+}
+
 .comment {
     padding: 10px;
     margin-bottom: 5px;
@@ -30,14 +35,16 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.comment p {
+.comment-content {
+    display: inline-block;
     font-size: 1rem;
     color: #555;
-    margin: 0 0 10px 0;
+    margin: 0 0 5px 0;
 }
 
-.comment span {
+.author {
     display: block;
+    margin: 5px 0;
     font-size: 0.9rem;
     color: #888;
 }
