@@ -72,3 +72,16 @@ h2 {
     font-size: 16px;
     font-weight: bold;
 }
+
+.deleted {
+    display: inline-block;
+    background-color: #f44336;
+    padding: 5px 10px;
+    font-size: 0.6rem;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    transition: background-color 0.3s ease;
+    text-transform: uppercase;
+}
