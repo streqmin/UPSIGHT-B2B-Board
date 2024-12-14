@@ -64,3 +64,14 @@ form#register-form button[type="submit"]:hover {
     margin-top: 10px;
     display: none;
 }
+
+.error-message {
+    color: #d9534f;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.password-error {
+    margin-bottom: 3px;
+    font-size: 0.8em;
+}
