@@ -28,9 +28,6 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         if user is None:
             raise AuthenticationFailed('Invalid username or password.')
 
-        # Django 세션 로그인 (원한다면 추가)
-        login(request, user)
-
         # 기본 JWT 발급 로직 실행
         response = super().post(request, *args, **kwargs)
         data = response.data
