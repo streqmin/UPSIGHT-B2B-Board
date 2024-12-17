@@ -13,7 +13,7 @@ class CookieJWTAuthentication(JWTAuthentication):
             validated_token = self.get_validated_token(access_token)
             user = self.get_user(validated_token)
         except (InvalidToken, AuthenticationFailed, TokenError):
-            return None  # 인증 실패 시 None 반환
+            return None
 
         if user is None or not user.is_active:
             return None

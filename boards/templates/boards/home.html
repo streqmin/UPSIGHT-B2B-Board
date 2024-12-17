@@ -46,6 +46,7 @@ function renderPosts(posts) {
   const postList = document.getElementById('post-list');
   postList.innerHTML = posts.map(post => `
     <div class="post">
+      ${post.deleted_at ? '<div class="deleted">deleted</div>' : ''}
       <h3>${post.title}</h3>
       <p>${post.content ? post.content.substring(0, 100) : ''}...</p>
       <a href="/board/posts/${post.id}/">자세히 보기</a>

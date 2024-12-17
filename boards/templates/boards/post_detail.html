@@ -2,25 +2,36 @@
 {% load static %}
 {% block css %}
   <link rel="stylesheet" href="{% static 'css/post-detail.css' %}">
+  <link rel="stylesheet" href="{% static 'css/post-detail-id.css' %}">
+  <link rel="stylesheet" href="{% static 'css/post-detail-comment.css' %}">
 {% endblock css %}
 {% block content %}
   <div id="post-container">
+    <div class="status-bar"></div>
     <h2 id="post-title"></h2>
+    <input type="text" id="edit-title" />
     <div id="post-meta">
       <span id="post-author"></span> | <span id="post-created-at"></span>
     </div>
+    <!-- Edit 버튼 -->
+    <button id="edit-button" onclick="enableEditMode()">Edit</button>
+    <button id="save-button" onclick="savePost()">Save</button>
+    <!-- 삭제 버튼 -->
+    <button id="delete-button" onclick="confirmDelete()">Delete</button>
     <div id="post-content"></div>
-  </div>
-  <div id="error-message"></div>
-  <!-- Edit 버튼 -->
-  <button id="edit-button" style="display:none;" onclick="enableEditMode()">Edit</button>
-  <button id="save-button" style="display:none;" onclick="savePost()">Save</button>
-  <div id="edit-form" style="display:none;">
-    <input type="text" id="edit-title" />
     <textarea id="edit-content"></textarea>
   </div>
-  <!-- 삭제 버튼 -->
-  <button id="delete-button" style="display:none;" onclick="confirmDelete()">Delete</button>
+  <div id="error-message"></div>
+  <!-- 댓글 영역 -->
+  <div id="comments-container">
+    <h3>댓글</h3>
+    <ul id="comment-list">
+    </ul>
+    <div id="comment-form">
+      <textarea id="comment-input" placeholder="댓글을 입력하세요"></textarea>
+      <button onclick="addComment()">댓글 달기</button>
+    </div>
+  </div>
 {% endblock content %}
 {% block javascript %}
   <script>
@@ -48,6 +59,7 @@
         if (response.ok) {
           post = await response.json();
           renderPost(post);
+          fetchComments(postId); // 댓글 데이터 가져오기
         } else {
           throw new Error('게시글 불러오기 실패');
         }
@@ -58,13 +70,15 @@
     }
 
     function renderPost(post) {
+      const statusBar = document.querySelector('.status-bar');
       const titleElement = document.getElementById('post-title');
       const contentElement = document.getElementById('post-content');
       const authorElement = document.getElementById('post-author');
       const createdAtElement = document.getElementById('post-created-at');
       const editButton = document.getElementById('edit-button');
       const deleteButton = document.getElementById('delete-button');
-
+      
+      statusBar.innerHTML = post.deleted_at ? '<span class="deleted">deleted</span>' : '';
       titleElement.textContent = post.title;
       contentElement.innerHTML = post.content;
       authorElement.textContent = `작성자: ${post.author}`;
@@ -88,7 +102,8 @@
       // Edit 모드로 변경
       document.getElementById('edit-title').value = post.title;
       document.getElementById('edit-content').value = post.content;
-      document.getElementById('edit-form').style.display = 'block';
+      document.getElementById('edit-title').style.display = 'block';
+      document.getElementById('edit-content').style.display = 'block';
       document.getElementById('save-button').style.display = 'inline-block';
       document.getElementById('post-title').style.display = 'none';
       document.getElementById('post-content').style.display = 'none';
@@ -130,10 +145,11 @@
 
     function cancelEditMode() {
       isEditing = false;
-      document.getElementById('edit-form').style.display = 'none';
       document.getElementById('save-button').style.display = 'none';
       document.getElementById('post-title').style.display = 'block';
       document.getElementById('post-content').style.display = 'block';
+      document.getElementById('edit-title').style.display = 'none';
+      document.getElementById('edit-content').style.display = 'none';
       document.getElementById('edit-button').style.display = 'inline-block';
     }
 
@@ -145,8 +161,6 @@
       }
     }
 
-    // 게시글 삭제
-    // 게시글 삭제
 async function deletePost() {
   const postId = getPostIdFromURL();
 
@@ -173,8 +187,125 @@ async function deletePost() {
   }
 }
 
+  async function fetchComments(postId) {
+    try {
+      const response = await fetch(`/api/board/comments/?post=${postId}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-    // 페이지 로드 시 게시글 데이터 가져오기
-    fetchPost();
+      if (response.ok) {
+        const comments = await response.json();
+        renderComments(comments.results);
+      } else {
+        throw new Error('댓글 불러오기 실패');
+      }
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+      alert(error.message);
+    }
+  }
+
+  // 댓글 렌더링
+  function renderComments(comments) {
+    const commentList = document.getElementById('comment-list');
+    commentList.innerHTML = '';
+
+    comments.forEach((comment) => {
+      const commentElement = document.createElement('div');
+      commentElement.className = 'comment';
+      commentElement.innerHTML = `
+      ${comment.deleted_at ? '<span class="deleted">deleted</span>' : ''}
+      <p class="comment-content">${comment.content}</p>
+      <span class="author">작성자: ${comment.author}</span>
+      ${comment.author === "{{ user.username }}" || "{{ user.role }}" === "BUSINESS_ADMIN"
+      ? `<button class="comment-edit-button" onclick="editComment(${comment.id})">수정</button>
+      <button class="comment-delete-button" onclick="deleteComment(${comment.id})">삭제</button>`
+      : ''}
+      `;
+      commentList.appendChild(commentElement);
+    });
+  }
+
+  // 댓글 추가
+  async function addComment() {
+    const postId = getPostIdFromURL();
+    const content = document.getElementById('comment-input').value;
+
+    try {
+      const response = await fetch('/api/board/comments/', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ post: postId, content }),
+      });
+
+      if (response.ok) {
+        document.getElementById('comment-input').value = '';
+        fetchComments(postId);
+      } else {
+        throw new Error('댓글 추가 실패');
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      alert(error.message);
+    }
+  }
+
+  // 댓글 수정
+  async function editComment(commentId) {
+    const newContent = prompt('수정할 댓글 내용을 입력하세요:');
+    if (!newContent) return;
+
+    try {
+      const response = await fetch(`/api/board/comments/${commentId}/`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content: newContent }),
+      });
+
+      if (response.ok) {
+        fetchComments(getPostIdFromURL());
+      } else {
+        throw new Error('댓글 수정 실패');
+      }
+    } catch (error) {
+      console.error('Error editing comment:', error);
+      alert(error.message);
+    }
+  }
+
+  // 댓글 삭제
+  async function deleteComment(commentId) {
+    try {
+      const response = await fetch(`/api/board/comments/${commentId}/`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        fetchComments(getPostIdFromURL());
+      } else {
+        throw new Error('댓글 삭제 실패');
+      }
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+      alert(error.message);
+    }
+  }
+
+  // 페이지 로드 시 게시글 및 댓글 데이터 가져오기
+  fetchPost();
   </script>
 {% endblock javascript %}

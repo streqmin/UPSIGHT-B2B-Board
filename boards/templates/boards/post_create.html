@@ -6,17 +6,15 @@
 {% block content %}
   <div id="post-create-container">
     <h2>게시글 작성</h2>
-    <form id="post-create-form">
-      <label for="title">제목</label>
-      <input type="text"
-             id="title"
-             name="title"
-             required
-             placeholder="게시글 제목을 입력하세요" />
-      <label for="content">내용</label>
-      <textarea id="content" name="content" required placeholder="게시글 내용을 입력하세요"></textarea>
-      <button type="button" id="save-button" onclick="savePost()">저장하기</button>
-    </form>
+    <label for="title">제목</label>
+    <input type="text"
+           id="title"
+           name="title"
+           required
+           placeholder="게시글 제목을 입력하세요" />
+    <label for="content">내용</label>
+    <textarea id="content" name="content" required placeholder="게시글 내용을 입력하세요"></textarea>
+    <button type="button" id="save-button" onclick="savePost()">저장하기</button>
   </div>
 {% endblock content %}
 {% block javascript %}
