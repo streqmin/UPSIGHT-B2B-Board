@@ -7,14 +7,18 @@ class JWTUserMiddleware:
         self.jwt_authenticator = CookieJWTAuthentication()
 
     def __call__(self, request):
-        # JWT 토큰을 이용해 사용자 인증
         try:
             user, validated_token = self.jwt_authenticator.authenticate(request)
-            request.user = user
-            request.token = validated_token
-        except Exception:
-            # 인증 실패 시 익명 사용자로 설정
+            if user:
+                request.user = user
+                request._cached_user = user  # Django가 사용하는 _cached_user 설정
+                request.token = validated_token
+            else:
+                request.user = AnonymousUser()
+                request._cached_user = AnonymousUser()
+        except Exception as e:
             request.user = AnonymousUser()
+            request._cached_user = AnonymousUser()
 
         response = self.get_response(request)
         return response
