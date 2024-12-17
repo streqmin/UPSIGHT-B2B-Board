@@ -12,10 +12,14 @@ class CookieJWTAuthentication(JWTAuthentication):
         try:
             validated_token = self.get_validated_token(access_token)
             user = self.get_user(validated_token)
-        except (InvalidToken, AuthenticationFailed, TokenError):
-            return None
+        except InvalidToken as e:
+            raise AuthenticationFailed("Invalid token.")
+        except TokenError as e:
+            raise AuthenticationFailed("Token error: " + str(e))
+        except Exception as e:
+            raise AuthenticationFailed(str(e))
 
         if user is None or not user.is_active:
-            return None
+            raise AuthenticationFailed("User is inactive.")
 
         return (user, validated_token)

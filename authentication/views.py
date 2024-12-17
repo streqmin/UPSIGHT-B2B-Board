@@ -1,5 +1,5 @@
 from django.views.generic import TemplateView
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate
 from rest_framework import generics, viewsets, permissions, filters, status
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
@@ -58,20 +58,21 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 # JWT Refresh 토큰도 쿠키로 설정
 class CustomTokenRefreshView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)  # 기본 토큰 갱신 로직 실행
+        # 기본 TokenRefreshView의 로직을 실행하여 토큰 갱신
+        response = super().post(request, *args, **kwargs)
         data = response.data
-        access_token = data.pop('access', None)
+        access_token = data.get('access')
 
-        # 쿠키에 갱신된 Access 토큰 설정
-        response = Response({'message': 'Token refreshed'})
-        if access_token:
-            response.set_cookie(
-                'access_token',
-                access_token,
-                httponly=True,
-                secure=True,
-                samesite='Lax'
-            )
+        if not access_token:
+            return Response({"detail": "Access token could not be refreshed."}, status=400)
+
+        response.set_cookie(
+            'access_token',
+            access_token,
+            httponly=True,
+            secure=True,
+            samesite='Lax'
+        )
         return response
 
 class LogoutView(TokenBlacklistView):
@@ -92,8 +93,6 @@ class LogoutView(TokenBlacklistView):
             return Response({"detail": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-        logout(request)
         
         # 쿠키 삭제
         response = Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
