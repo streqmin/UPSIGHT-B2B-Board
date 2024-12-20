@@ -53,6 +53,52 @@
             <p>© 2024 UPSIGHT 게시판</p>
         </footer>
         <!-- JavaScript -->
+        <script>
+            async function refreshAccessToken() {
+                try {
+                    // Refresh token 요청
+                    const response = await fetch("{% url 'token_refresh' %}", {
+                        method: "POST",
+                        credentials: "include", // Refresh token이 HttpOnly 쿠키에 저장된 경우 필요
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({}),
+                    });
+
+                    if (response.ok) {
+                        console.log("Access token successfully refreshed.");
+                        // Access token 재발급 성공 시, 새로고침
+                        {% comment %} window.location.reload(); {% endcomment %}
+                    } else {
+                        console.error("Failed to refresh access token.");
+                        // 재발급 실패 시 로그아웃으로 이동
+                        {% comment %} window.location.href = "{% url 'authentication:login' %}"; {% endcomment %}
+                    }
+                } catch (error) {
+                    console.error("Error during token refresh:", error);
+                    window.location.href = "{% url 'authentication:login' %}";
+                }
+            }
+
+            // 전역적으로 fetch API를 확장하여 에러를 감지하고 처리
+            const originalFetch = window.fetch;
+            window.fetch = async (...args) => {
+                const response = await originalFetch(...args);
+
+                if (response.status === 401) {
+                    const data = await response.json();
+
+                    // Access token이 만료된 경우 처리
+                    if (data.detail === "Access token has expired.") {
+                        console.warn("Access token has expired. Attempting to refresh...");
+                        await refreshAccessToken();
+                    }
+                }
+
+                return response;
+            };
+        </script>
         <script src="{% static 'js/base.js' %}"></script>
         {% block javascript %}
         {% endblock javascript %}
