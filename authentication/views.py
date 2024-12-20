@@ -4,6 +4,7 @@ from rest_framework import generics, viewsets, permissions, filters, status
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenBlacklistView
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from django_filters.rest_framework import DjangoFilterBackend
@@ -34,7 +35,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         access_token = data.pop('access', None)  # JWT 토큰을 응답 본문에서 제거
         refresh_token = data.pop('refresh', None)
 
-    # JWT가 존재하는 경우(로그인 성공)
+        # JWT가 존재하는 경우(로그인 성공)
         response = Response({'message': 'Login successful'}, status=response.status_code)
         if access_token:
             response.set_cookie(
@@ -55,17 +56,28 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         return response
 
 
-# JWT Refresh 토큰도 쿠키로 설정
 class CustomTokenRefreshView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
-        # 기본 TokenRefreshView의 로직을 실행하여 토큰 갱신
-        response = super().post(request, *args, **kwargs)
-        data = response.data
-        access_token = data.get('access')
+        refresh_token = request.COOKIES.get('refresh_token')
+        if not refresh_token:
+            return Response({"detail": "No refresh token provided in cookie."}, status=400)
+
+        # refresh_token을 data에 직접 넣어서 Serializer 호출
+        serializer = TokenRefreshSerializer(data={'refresh': refresh_token})
+        try:
+            serializer.is_valid(raise_exception=True)
+        except TokenError as e:
+            # 토큰이 만료되었거나 잘못된 경우
+            raise AuthenticationFailed(e.args[0])
+
+        # 유효한 경우 새 access token 반환
+        response_data = serializer.validated_data
+        access_token = response_data.get('access')
 
         if not access_token:
             return Response({"detail": "Access token could not be refreshed."}, status=400)
 
+        response = Response(response_data, status=200)
         response.set_cookie(
             'access_token',
             access_token,
@@ -90,7 +102,7 @@ class LogoutView(TokenBlacklistView):
             token = RefreshToken(refresh_token)
             token.blacklist()
         except TokenError as e:
-            return Response({"detail": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
