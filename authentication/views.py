@@ -91,22 +91,22 @@ class LogoutView(TokenBlacklistView):
     """
     SimpleJWT의 TokenBlacklistView를 상속하여 로그아웃 기능 구현.
     """
-    permission_classes = []
+    
     def post(self, request, *args, **kwargs):
-        # 쿠키에서 refresh_token 가져오기
         refresh_token = request.COOKIES.get('refresh_token')
-        if not refresh_token:
-            return Response({"detail": "Refresh token is required."}, status=status.HTTP_400_BAD_REQUEST)
+        access_token = request.COOKIES.get('access_token')
+
+        if not refresh_token and not access_token:
+            return Response({"detail": "No refresh_token or access_token found in cookies."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             token = RefreshToken(refresh_token)
             token.blacklist()
-        except TokenError as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # 쿠키 삭제
+        except TokenError:
+            pass
+        except Exception:
+            pass
+
         response = Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
         response.delete_cookie('refresh_token')
         response.delete_cookie('access_token')
