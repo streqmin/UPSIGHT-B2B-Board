@@ -93,10 +93,8 @@
             })
             .then(response => {
                 if (response.ok) {
-                    // 성공 메시지 표시
-                    const successMessageDiv = document.getElementById('success-message');
-                    successMessageDiv.style.display = 'block';
-                    form.reset();
+                    // 회원가입 성공 시 로그인 페이지로 이동
+                    window.location.href = "{% url 'authentication:login' %}";
                 } else {
                     return response.json().then(data => {
                         // 서버 응답에서 에러 메시지 처리
