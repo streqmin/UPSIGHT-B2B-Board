@@ -34,6 +34,8 @@
     </ul>
     <div id="comment-form">
       <textarea id="comment-input" placeholder="댓글을 입력하세요"></textarea>
+      <label for="comment-is-public">공개 여부</label>
+      <input type="checkbox" id="comment-is-public" checked />
       <button onclick="addComment()">댓글 달기</button>
     </div>
   </div>
@@ -122,8 +124,6 @@
 
     function enableEditMode() {
       isEditing = true;
-
-      // Edit 모드로 변경
       document.getElementById('edit-title').value = post.title;
       document.getElementById('edit-content').value = post.content;
       document.getElementById('edit-title').style.display = 'block';
@@ -177,7 +177,6 @@
       document.getElementById('edit-button').style.display = 'inline-block';
     }
 
-    // 삭제 확인
     function confirmDelete() {
       const confirmation = confirm("삭제하시겠습니까?");
       if (confirmation) {
@@ -238,12 +237,29 @@
       comments.forEach((comment) => {
         const commentElement = document.createElement('div');
         commentElement.className = 'comment';
+
+        const canSeeIsPublic = (comment.author === "{{ user.username }}" || "{{ user.role }}" === "admin");
+        const canEditIsPublic = (comment.author === "{{ user.username }}");
+
+        const isPublicSection = canSeeIsPublic
+          ? `
+            <div class="comment-public-container">
+              <label for="comment-public-${comment.id}">공개 여부</label>
+              <input type="checkbox"
+                     id="comment-public-${comment.id}"
+                     ${comment.is_public ? "checked" : ""}
+                     ${canEditIsPublic ? "" : "disabled"}
+                    onchange="updateCommentPublic(${comment.id})" />
+            </div>
+            `: "";
+
         commentElement.innerHTML = `
           ${comment.deleted_at ? '<span class="deleted">deleted</span>' : ''}
           <p class="comment-content">${comment.content}</p>
           <span class="author">작성자: ${comment.author}</span>
+          ${isPublicSection}
           ${
-            comment.author === "{{ user.username }}" || "{{ user.role }}" === "BUSINESS_ADMIN"
+            comment.author === "{{ user.username }}"
             ? `<button class="comment-edit-button" onclick="editComment(${comment.id})">수정</button>
                <button class="comment-delete-button" onclick="deleteComment(${comment.id})">삭제</button>`
             : ''
@@ -256,6 +272,7 @@
     async function addComment() {
       const postId = getPostIdFromURL();
       const content = document.getElementById('comment-input').value;
+      const isPublic = document.getElementById('comment-is-public').checked;
 
       try {
         const response = await fetch('/api/board/comments/', {
@@ -264,7 +281,7 @@
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ post: postId, content }),
+          body: JSON.stringify({ post: postId, content, is_public: isPublic }),
         });
 
         if (response.ok) {
@@ -325,7 +342,29 @@
       }
     }
 
-    // 페이지 로드 시 게시글 및 댓글 데이터 가져오기
+    async function updateCommentPublic(commentId) {
+      const checkbox = document.getElementById(`comment-public-${commentId}`);
+      const isPublicValue = checkbox.checked;
+
+      try {
+        const response = await fetch(`/api/board/comments/${commentId}/`, {
+          method: 'PATCH',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ is_public: isPublicValue }),
+        });
+
+        if (!response.ok) {
+          throw new Error('댓글 공개 여부 수정 실패');
+        }
+        // 성공 시, 목록 다시 불러와서 반영
+        fetchComments(getPostIdFromURL());
+      } catch (error) {
+        console.error('Error updating comment public state:', error);
+        alert(error.message);
+      }
+    }
+
     fetchPost();
   </script>
 {% endblock javascript %}

@@ -106,7 +106,10 @@ class CommentViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.role == BusinessMember.BUSINESS_ADMIN:
             return Comment.objects.all().order_by('-created_at')
-        return Comment.objects.filter(is_public=True, deleted_at__isnull=True).order_by('-created_at')
+        return Comment.objects.filter(
+            Q(is_public=True) | Q(author=user),
+            deleted_at__isnull=True
+        ).order_by('-created_at')
 
     def perform_create(self, serializer):
         """
