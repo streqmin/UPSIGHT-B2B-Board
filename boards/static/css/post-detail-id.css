@@ -104,3 +104,8 @@
 
     text-transform: uppercase;
 }
+
+#is_public,
+#public-check-container {
+    display: none;
+}

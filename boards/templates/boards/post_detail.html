@@ -18,6 +18,11 @@
     <button id="save-button" onclick="savePost()">Save</button>
     <!-- 삭제 버튼 -->
     <button id="delete-button" onclick="confirmDelete()">Delete</button>
+    <!-- is_public 체크박스 -->
+    <div id="public-check-container">
+      <label for="is_public">공개 여부</label>
+      <input type="checkbox" id="is_public" name="is_public" />
+    </div>
     <div id="post-content"></div>
     <textarea id="edit-content"></textarea>
   </div>
@@ -77,6 +82,8 @@
       const createdAtElement = document.getElementById('post-created-at');
       const editButton = document.getElementById('edit-button');
       const deleteButton = document.getElementById('delete-button');
+      const publicCheckContainer = document.getElementById('public-check-container');
+      const isPublicCheckbox = document.getElementById('is_public');
       
       statusBar.innerHTML = post.deleted_at ? '<span class="deleted">deleted</span>' : '';
       titleElement.textContent = post.title;
@@ -84,15 +91,32 @@
       authorElement.textContent = `작성자: ${post.author}`;
       const createdDate = new Date(post.created_at);
       createdAtElement.textContent = `작성일: ${createdDate.toLocaleString()}`;
+      isPublicCheckbox.checked = post.is_public;
 
       // 로그인한 사용자와 게시글 작성자가 일치하면 Edit 버튼을 표시
       if (post.author === "{{ user.username }}") {
         editButton.style.display = 'inline-block';
       }
-
       // 로그인한 사용자가 비즈니스 관리자거나, 작성자와 동일하면 Delete 버튼을 표시
       if (post.author === "{{ user.username }}" || "{{ user.role }}" === "BUSINESS_ADMIN") {
         deleteButton.style.display = 'inline-block';
+      }
+
+      // 1) 체크박스 보이기/숨기기
+      // - 작성자이거나 BUSINESS_ADMIN이면 체크박스가 화면에 보이도록
+      if (post.author === "{{ user.username }}" || "{{ user.role }}" === "admin") {
+        publicCheckContainer.style.display = 'block';
+        isPublicCheckbox.style.display = 'inline';
+      }
+
+      // 2) 체크박스 활성/비활성
+      // - 작성자: 활성화(수정 가능)
+      // - BUSINESS_ADMIN(단, 작성자가 아님): 비활성화(수정 불가)
+      console.log("{{ user.role }}");
+      if ("{{ user.role }}" === "admin" && post.author !== "{{ user.username }}") {
+        isPublicCheckbox.disabled = true;  // 관리자 but 작성자가 아님 → 비활성
+      } else {
+        isPublicCheckbox.disabled = false;
       }
     }
 
@@ -115,11 +139,11 @@
       const updatedPost = {
         title: document.getElementById('edit-title').value,
         content: document.getElementById('edit-content').value,
+        is_public: document.getElementById('is_public').checked
       };
 
       try {
         const url = "{% url 'post-detail' 'post_id' %}".replace('post_id', postId);
-        
         const response = await fetch(url, {
           method: 'PATCH',
           credentials: 'include',
@@ -161,151 +185,147 @@
       }
     }
 
-async function deletePost() {
-  const postId = getPostIdFromURL();
+    async function deletePost() {
+      const postId = getPostIdFromURL();
+      try {
+        const url = "{% url 'post-detail' 'post_id' %}".replace('post_id', postId);
+        const response = await fetch(url, {
+          method: 'DELETE',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
 
-  try {
-    const url = "{% url 'post-detail' 'post_id' %}".replace('post_id', postId);
-    
-    const response = await fetch(url, {
-      method: 'DELETE',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json'
+        if (response.ok) {
+          alert("게시글이 삭제되었습니다.");
+          window.location.href = "/board/";  // 삭제 후 이동
+        } else {
+          throw new Error('게시글 삭제 실패');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert(error.message);
       }
-    });
-
-    if (response.ok) {
-      alert("게시글이 삭제되었습니다.");
-      window.location.href = "/board/";  // 삭제 후 프로젝트 루트로 이동
-    } else {
-      throw new Error('게시글 삭제 실패');
     }
-  } catch (error) {
-    console.error('Error:', error);
-    alert(error.message);
-  }
-}
 
-  async function fetchComments(postId) {
-    try {
-      const response = await fetch(`/api/board/comments/?post=${postId}`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+    async function fetchComments(postId) {
+      try {
+        const response = await fetch(`/api/board/comments/?post=${postId}`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const comments = await response.json();
+          renderComments(comments.results);
+        } else {
+          throw new Error('댓글 불러오기 실패');
+        }
+      } catch (error) {
+        console.error('Error fetching comments:', error);
+        alert(error.message);
+      }
+    }
+
+    function renderComments(comments) {
+      const commentList = document.getElementById('comment-list');
+      commentList.innerHTML = '';
+
+      comments.forEach((comment) => {
+        const commentElement = document.createElement('div');
+        commentElement.className = 'comment';
+        commentElement.innerHTML = `
+          ${comment.deleted_at ? '<span class="deleted">deleted</span>' : ''}
+          <p class="comment-content">${comment.content}</p>
+          <span class="author">작성자: ${comment.author}</span>
+          ${
+            comment.author === "{{ user.username }}" || "{{ user.role }}" === "BUSINESS_ADMIN"
+            ? `<button class="comment-edit-button" onclick="editComment(${comment.id})">수정</button>
+               <button class="comment-delete-button" onclick="deleteComment(${comment.id})">삭제</button>`
+            : ''
+          }
+        `;
+        commentList.appendChild(commentElement);
       });
-
-      if (response.ok) {
-        const comments = await response.json();
-        renderComments(comments.results);
-      } else {
-        throw new Error('댓글 불러오기 실패');
-      }
-    } catch (error) {
-      console.error('Error fetching comments:', error);
-      alert(error.message);
     }
-  }
 
-  // 댓글 렌더링
-  function renderComments(comments) {
-    const commentList = document.getElementById('comment-list');
-    commentList.innerHTML = '';
+    async function addComment() {
+      const postId = getPostIdFromURL();
+      const content = document.getElementById('comment-input').value;
 
-    comments.forEach((comment) => {
-      const commentElement = document.createElement('div');
-      commentElement.className = 'comment';
-      commentElement.innerHTML = `
-      ${comment.deleted_at ? '<span class="deleted">deleted</span>' : ''}
-      <p class="comment-content">${comment.content}</p>
-      <span class="author">작성자: ${comment.author}</span>
-      ${comment.author === "{{ user.username }}" || "{{ user.role }}" === "BUSINESS_ADMIN"
-      ? `<button class="comment-edit-button" onclick="editComment(${comment.id})">수정</button>
-      <button class="comment-delete-button" onclick="deleteComment(${comment.id})">삭제</button>`
-      : ''}
-      `;
-      commentList.appendChild(commentElement);
-    });
-  }
+      try {
+        const response = await fetch('/api/board/comments/', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ post: postId, content }),
+        });
 
-  // 댓글 추가
-  async function addComment() {
-    const postId = getPostIdFromURL();
-    const content = document.getElementById('comment-input').value;
-
-    try {
-      const response = await fetch('/api/board/comments/', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ post: postId, content }),
-      });
-
-      if (response.ok) {
-        document.getElementById('comment-input').value = '';
-        fetchComments(postId);
-      } else {
-        throw new Error('댓글 추가 실패');
+        if (response.ok) {
+          document.getElementById('comment-input').value = '';
+          fetchComments(postId);
+        } else {
+          throw new Error('댓글 추가 실패');
+        }
+      } catch (error) {
+        console.error('Error adding comment:', error);
+        alert(error.message);
       }
-    } catch (error) {
-      console.error('Error adding comment:', error);
-      alert(error.message);
     }
-  }
 
-  // 댓글 수정
-  async function editComment(commentId) {
-    const newContent = prompt('수정할 댓글 내용을 입력하세요:');
-    if (!newContent) return;
+    async function editComment(commentId) {
+      const newContent = prompt('수정할 댓글 내용을 입력하세요:');
+      if (!newContent) return;
 
-    try {
-      const response = await fetch(`/api/board/comments/${commentId}/`, {
-        method: 'PATCH',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ content: newContent }),
-      });
+      try {
+        const response = await fetch(`/api/board/comments/${commentId}/`, {
+          method: 'PATCH',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ content: newContent }),
+        });
 
-      if (response.ok) {
-        fetchComments(getPostIdFromURL());
-      } else {
-        throw new Error('댓글 수정 실패');
+        if (response.ok) {
+          fetchComments(getPostIdFromURL());
+        } else {
+          throw new Error('댓글 수정 실패');
+        }
+      } catch (error) {
+        console.error('Error editing comment:', error);
+        alert(error.message);
       }
-    } catch (error) {
-      console.error('Error editing comment:', error);
-      alert(error.message);
     }
-  }
 
-  // 댓글 삭제
-  async function deleteComment(commentId) {
-    try {
-      const response = await fetch(`/api/board/comments/${commentId}/`, {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+    async function deleteComment(commentId) {
+      try {
+        const response = await fetch(`/api/board/comments/${commentId}/`, {
+          method: 'DELETE',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
 
-      if (response.ok) {
-        fetchComments(getPostIdFromURL());
-      } else {
-        throw new Error('댓글 삭제 실패');
+        if (response.ok) {
+          fetchComments(getPostIdFromURL());
+        } else {
+          throw new Error('댓글 삭제 실패');
+        }
+      } catch (error) {
+        console.error('Error deleting comment:', error);
+        alert(error.message);
       }
-    } catch (error) {
-      console.error('Error deleting comment:', error);
-      alert(error.message);
     }
-  }
 
-  // 페이지 로드 시 게시글 및 댓글 데이터 가져오기
-  fetchPost();
+    // 페이지 로드 시 게시글 및 댓글 데이터 가져오기
+    fetchPost();
   </script>
 {% endblock javascript %}
