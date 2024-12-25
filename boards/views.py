@@ -44,12 +44,12 @@ class PostViewSet(viewsets.ModelViewSet):
         """
         # Swagger 스키마 생성 중인 경우 모든 게시글을 반환하여 예외 방지
         if getattr(self, 'swagger_fake_view', False):
-            return Post.objects.all()
+            return Post.objects.all().order_by('-created_at')
         
         user = self.request.user
         if user.role == BusinessMember.BUSINESS_ADMIN:
-            return Post.objects.all()
-        return Post.objects.filter(Q(is_public=True) | Q(author=user), deleted_at__isnull=True)
+            return Post.objects.all().order_by('-created_at')
+        return Post.objects.filter(Q(is_public=True) | Q(author=user), deleted_at__isnull=True).order_by('-created_at')
 
     def perform_create(self, serializer):
         """
@@ -101,12 +101,12 @@ class CommentViewSet(viewsets.ModelViewSet):
         """
         # Swagger 스키마 생성 중인 경우 모든 댓글을 반환하여 예외 방지
         if getattr(self, 'swagger_fake_view', False):
-            return Comment.objects.all()
+            return Comment.objects.all().order_by('-created_at')
         
         user = self.request.user
         if user.role == BusinessMember.BUSINESS_ADMIN:
-            return Comment.objects.all()
-        return Comment.objects.filter(is_public=True, deleted_at__isnull=True)
+            return Comment.objects.all().order_by('-created_at')
+        return Comment.objects.filter(is_public=True, deleted_at__isnull=True).order_by('-created_at')
 
     def perform_create(self, serializer):
         """
