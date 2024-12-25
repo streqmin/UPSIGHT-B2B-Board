@@ -14,6 +14,8 @@
            placeholder="게시글 제목을 입력하세요" />
     <label for="content">내용</label>
     <textarea id="content" name="content" required placeholder="게시글 내용을 입력하세요"></textarea>
+    <label for="is_public">공개 여부</label>
+    <input type="checkbox" id="is_public" name="is_public" checked />
     <button type="button" id="save-button" onclick="savePost()">저장하기</button>
   </div>
 {% endblock content %}
@@ -22,6 +24,7 @@
     async function savePost() {
       const title = document.getElementById('title').value;
       const content = document.getElementById('content').value;
+      const isPublic = document.getElementById('is_public').checked;  // 체크 여부 가져오기
 
       if (!title || !content) {
         alert('제목과 내용을 모두 입력해주세요.');
@@ -31,6 +34,7 @@
       const newPost = {
         title: title,
         content: content,
+        is_public: isPublic
       };
 
       try {
