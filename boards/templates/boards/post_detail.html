@@ -87,6 +87,7 @@
       const publicCheckContainer = document.getElementById('public-check-container');
       const isPublicCheckbox = document.getElementById('is_public');
       
+      const isDeleted = !!post.deleted_at;
       statusBar.innerHTML = post.deleted_at ? '<span class="deleted">deleted</span>' : '';
       titleElement.textContent = post.title;
       contentElement.innerHTML = post.content;
@@ -95,30 +96,31 @@
       createdAtElement.textContent = `작성일: ${createdDate.toLocaleString()}`;
       isPublicCheckbox.checked = post.is_public;
 
-      // 로그인한 사용자와 게시글 작성자가 일치하면 Edit 버튼을 표시
-      if (post.author === "{{ user.username }}") {
-        editButton.style.display = 'inline-block';
-      }
-      // 로그인한 사용자가 비즈니스 관리자거나, 작성자와 동일하면 Delete 버튼을 표시
-      if (post.author === "{{ user.username }}" || "{{ user.role }}" === "BUSINESS_ADMIN") {
-        deleteButton.style.display = 'inline-block';
-      }
+      if(!isDeleted){
+        // 로그인한 사용자와 게시글 작성자가 일치하면 Edit 버튼을 표시
+        if (post.author === "{{ user.username }}") {
+          editButton.style.display = 'inline-block';
+        }
+        // 로그인한 사용자가 비즈니스 관리자거나, 작성자와 동일하면 Delete 버튼을 표시
+        if (post.author === "{{ user.username }}" || "{{ user.role }}" === "BUSINESS_ADMIN") {
+          deleteButton.style.display = 'inline-block';
+        }
 
-      // 1) 체크박스 보이기/숨기기
-      // - 작성자이거나 BUSINESS_ADMIN이면 체크박스가 화면에 보이도록
-      if (post.author === "{{ user.username }}" || "{{ user.role }}" === "admin") {
-        publicCheckContainer.style.display = 'block';
-        isPublicCheckbox.style.display = 'inline';
-      }
+        // 1) 체크박스 보이기/숨기기
+        // - 작성자이거나 BUSINESS_ADMIN이면 체크박스가 화면에 보이도록
+        if (post.author === "{{ user.username }}" || "{{ user.role }}" === "admin") {
+          publicCheckContainer.style.display = 'block';
+          isPublicCheckbox.style.display = 'inline';
+        }
 
-      // 2) 체크박스 활성/비활성
-      // - 작성자: 활성화(수정 가능)
-      // - BUSINESS_ADMIN(단, 작성자가 아님): 비활성화(수정 불가)
-      console.log("{{ user.role }}");
-      if ("{{ user.role }}" === "admin" && post.author !== "{{ user.username }}") {
-        isPublicCheckbox.disabled = true;  // 관리자 but 작성자가 아님 → 비활성
-      } else {
-        isPublicCheckbox.disabled = false;
+        // 2) 체크박스 활성/비활성
+        // - 작성자: 활성화(수정 가능)
+        // - BUSINESS_ADMIN(단, 작성자가 아님): 비활성화(수정 불가)
+        if ("{{ user.role }}" === "admin" && post.author !== "{{ user.username }}") {
+          isPublicCheckbox.disabled = true;  // 관리자 but 작성자가 아님 → 비활성
+        } else {
+          isPublicCheckbox.disabled = false;
+        }
       }
     }
 
@@ -237,6 +239,7 @@
       comments.forEach((comment) => {
         const commentElement = document.createElement('div');
         commentElement.className = 'comment';
+        const isCommentDeleted = !!comment.deleted_at;
 
         const canSeeIsPublic = (comment.author === "{{ user.username }}" || "{{ user.role }}" === "admin");
         const canEditIsPublic = (comment.author === "{{ user.username }}");
@@ -259,7 +262,7 @@
           <span class="author">작성자: ${comment.author}</span>
           ${isPublicSection}
           ${
-            comment.author === "{{ user.username }}"
+            (comment.author === "{{ user.username }}" && !isCommentDeleted)
             ? `<button class="comment-edit-button" onclick="editComment(${comment.id})">수정</button>
                <button class="comment-delete-button" onclick="deleteComment(${comment.id})">삭제</button>`
             : ''
