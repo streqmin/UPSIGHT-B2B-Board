@@ -56,6 +56,14 @@ class PostViewSet(viewsets.ModelViewSet):
         게시글 생성 시 author와 business 필드를 자동으로 설정.
         """
         serializer.save(author=self.request.user, business=self.request.user.business)
+    
+    def perform_update(self, serializer):
+        """이미 삭제된 Post인 경우 수정 불가"""
+        instance = serializer.instance
+        if instance.deleted_at is not None:
+            raise NotFound("이 게시글은 이미 삭제된 상태이므로 수정할 수 없습니다.")
+        # 정상적인 경우 그대로 업데이트 진행
+        super().perform_update(serializer)
 
     def perform_destroy(self, instance):
         """
@@ -116,6 +124,13 @@ class CommentViewSet(viewsets.ModelViewSet):
         댓글 생성 시 author 필드를 자동으로 설정.
         """
         serializer.save(author=self.request.user)
+        
+    def perform_update(self, serializer):
+        """이미 삭제된 Comment인 경우 수정 불가"""
+        instance = serializer.instance
+        if instance.deleted_at is not None:
+            raise NotFound("이 댓글은 이미 삭제된 상태이므로 수정할 수 없습니다.")
+        super().perform_update(serializer)
 
     def perform_destroy(self, instance):
         """
