@@ -44,18 +44,26 @@ class PostViewSet(viewsets.ModelViewSet):
         """
         # Swagger 스키마 생성 중인 경우 모든 게시글을 반환하여 예외 방지
         if getattr(self, 'swagger_fake_view', False):
-            return Post.objects.all()
+            return Post.objects.all().order_by('-created_at')
         
         user = self.request.user
         if user.role == BusinessMember.BUSINESS_ADMIN:
-            return Post.objects.all()
-        return Post.objects.filter(Q(is_public=True) | Q(author=user), deleted_at__isnull=True)
+            return Post.objects.all().order_by('-created_at')
+        return Post.objects.filter(Q(is_public=True) | Q(author=user), deleted_at__isnull=True).order_by('-created_at')
 
     def perform_create(self, serializer):
         """
         게시글 생성 시 author와 business 필드를 자동으로 설정.
         """
         serializer.save(author=self.request.user, business=self.request.user.business)
+    
+    def perform_update(self, serializer):
+        """이미 삭제된 Post인 경우 수정 불가"""
+        instance = serializer.instance
+        if instance.deleted_at is not None:
+            raise NotFound("이 게시글은 이미 삭제된 상태이므로 수정할 수 없습니다.")
+        # 정상적인 경우 그대로 업데이트 진행
+        super().perform_update(serializer)
 
     def perform_destroy(self, instance):
         """
@@ -101,18 +109,28 @@ class CommentViewSet(viewsets.ModelViewSet):
         """
         # Swagger 스키마 생성 중인 경우 모든 댓글을 반환하여 예외 방지
         if getattr(self, 'swagger_fake_view', False):
-            return Comment.objects.all()
+            return Comment.objects.all().order_by('-created_at')
         
         user = self.request.user
         if user.role == BusinessMember.BUSINESS_ADMIN:
-            return Comment.objects.all()
-        return Comment.objects.filter(is_public=True, deleted_at__isnull=True)
+            return Comment.objects.all().order_by('-created_at')
+        return Comment.objects.filter(
+            Q(is_public=True) | Q(author=user),
+            deleted_at__isnull=True
+        ).order_by('-created_at')
 
     def perform_create(self, serializer):
         """
         댓글 생성 시 author 필드를 자동으로 설정.
         """
         serializer.save(author=self.request.user)
+        
+    def perform_update(self, serializer):
+        """이미 삭제된 Comment인 경우 수정 불가"""
+        instance = serializer.instance
+        if instance.deleted_at is not None:
+            raise NotFound("이 댓글은 이미 삭제된 상태이므로 수정할 수 없습니다.")
+        super().perform_update(serializer)
 
     def perform_destroy(self, instance):
         """

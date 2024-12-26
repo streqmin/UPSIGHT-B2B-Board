@@ -1,5 +1,6 @@
 from django.views.generic import TemplateView
 from django.contrib.auth import authenticate
+from django.shortcuts import redirect
 from rest_framework import generics, viewsets, permissions, filters, status
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
@@ -18,10 +19,16 @@ class RegisterTemplateView(TemplateView):
 class LoginTemplateView(TemplateView):
     template_name = 'authentication/login.html'
 
+    def get(self, request, *args, **kwargs):
+        # 이미 인증된 사용자라면 로그인 페이지 대신 메인 페이지로 이동
+        if request.user.is_authenticated:
+            return redirect('boards:board_main')
+        # 미인증 사용자라면 로그인 템플릿 렌더링
+        return super().get(request, *args, **kwargs)
+
 # JWT를 쿠키에 넣는 커스텀 로그인 뷰
 class CustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
-        # 사용자 인증
         username = request.data.get('username')
         password = request.data.get('password')
 
@@ -32,10 +39,12 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         # 기본 JWT 발급 로직 실행
         response = super().post(request, *args, **kwargs)
         data = response.data
-        access_token = data.pop('access', None)  # JWT 토큰을 응답 본문에서 제거
+
+        # 발급된 JWT를 응답 본문에서 제거하고, 쿠키로 내려주기
+        access_token = data.pop('access', None)
         refresh_token = data.pop('refresh', None)
 
-        # JWT가 존재하는 경우(로그인 성공)
+        # 로그인 성공 메시지만 응답 본문에 담음
         response = Response({'message': 'Login successful'}, status=response.status_code)
         if access_token:
             response.set_cookie(
@@ -91,22 +100,22 @@ class LogoutView(TokenBlacklistView):
     """
     SimpleJWT의 TokenBlacklistView를 상속하여 로그아웃 기능 구현.
     """
-    permission_classes = []
+    
     def post(self, request, *args, **kwargs):
-        # 쿠키에서 refresh_token 가져오기
         refresh_token = request.COOKIES.get('refresh_token')
-        if not refresh_token:
-            return Response({"detail": "Refresh token is required."}, status=status.HTTP_400_BAD_REQUEST)
+        access_token = request.COOKIES.get('access_token')
+
+        if not refresh_token and not access_token:
+            return Response({"detail": "No refresh_token or access_token found in cookies."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             token = RefreshToken(refresh_token)
             token.blacklist()
-        except TokenError as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # 쿠키 삭제
+        except TokenError:
+            pass
+        except Exception:
+            pass
+
         response = Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
         response.delete_cookie('refresh_token')
         response.delete_cookie('access_token')
