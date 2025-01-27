@@ -145,9 +145,15 @@ class BusinessViewSet(viewsets.ModelViewSet):
     ordering_fields = ['name']
     ordering = ['name']
     
-    def get_permissions(self):
-        if self.action == 'list':
-            permission_classes = [permissions.AllowAny]
+    def perform_authentication(self, request):
+        """list 요청에서는 강제 인증을 수행하지 않음"""
+        if getattr(self, "action", None) == "list":
+            request.user = None  # 인증을 요구하지 않도록 설정
         else:
-            permission_classes = [IsBusinessAdmin]
-        return [permission() for permission in permission_classes]
+            super().perform_authentication(request)
+    
+    def get_permissions(self):
+        """list 요청에서는 AllowAny, 나머지 요청은 IsBusinessAdmin 적용"""
+        if getattr(self, "action", None) == "list":
+            return [permissions.AllowAny()]
+        return [IsBusinessAdmin()]
