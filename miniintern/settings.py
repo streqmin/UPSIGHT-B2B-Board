@@ -74,10 +74,11 @@ AUTH_USER_MODEL = 'authentication.BusinessMember'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DATABASE_NAME', 'UPSIGHT'),
-        'USER': config('DATABASE_USER', 'upsight'),
-        'PASSWORD': config('DATABASE_PASSWORD', '1q2w3e4r!'),
+        'NAME': config('POSTGRES_DB', 'upsight'),
+        'USER': config('POSTGRES_USER', 'upsight'),
+        'PASSWORD': config('POSTGRES_PASSWORD', '1q2w3e4r!'),
         'HOST': config('DATABASE_HOST', 'localhost'),
+        'PORT': config('DATABASE_PORT', '5432')
     }
 }
 
