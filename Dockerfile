@@ -1,4 +1,3 @@
-# 베이스 이미지 선택
 FROM python:3.11-slim
 
 # 환경 변수 설정
@@ -12,6 +11,7 @@ WORKDIR /code
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
+    netcat-openbsd \
     && rm -rf /var/lib/apt/lists/*
 
 # 파이썬 의존성 설치
@@ -22,8 +22,12 @@ RUN pip install -r requirements.txt
 # 프로젝트 파일 복사
 COPY . /code/
 
+# entrypoint.sh 복사 및 실행 권한 부여
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # 포트 노출
 EXPOSE 8000
 
-# 명령어 실행
-CMD ["gunicorn", "miniintern.wsgi:application", "--bind", "0.0.0.0:8000"]
+# 컨테이너 실행 시 entrypoint.sh 실행
+ENTRYPOINT ["/entrypoint.sh"]
