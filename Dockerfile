@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
     netcat-openbsd \
+    postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # 파이썬 의존성 설치
@@ -22,9 +23,10 @@ RUN pip install -r requirements.txt
 # 프로젝트 파일 복사
 COPY . /code/
 
-# entrypoint.sh 복사 및 실행 권한 부여
+# entrypoint.sh, init-db.sh 복사 및 실행 권한 부여
 COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY init-db.sh /init-db.sh
+RUN chmod +x /entrypoint.sh /init-db.sh
 
 # 포트 노출
 EXPOSE 8000
