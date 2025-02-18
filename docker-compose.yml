@@ -8,7 +8,7 @@ services:
         command: gunicorn miniintern.wsgi:application --bind 0.0.0.0:8000
         depends_on:
             db:
-                condition: service_healthy # DB가 완전히 시작될 때까지 기다림
+                condition: service_healthy
         ports:
             - "8000:8000"
         env_file:
@@ -28,8 +28,13 @@ services:
             - POSTGRES_HOST_AUTH_METHOD=trust
         volumes:
             - postgres_data:/var/lib/postgresql/data/
+            - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
         healthcheck:
-            test: ["CMD-SHELL", "pg_isready"]
+            test:
+                [
+                    "CMD-SHELL",
+                    "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}",
+                ]
             interval: 10s
             timeout: 5s
             retries: 5
