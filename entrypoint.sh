@@ -18,15 +18,6 @@ while ! pg_isready -h "$DATABASE_HOST" -p "$DATABASE_PORT"; do
 done
 echo "Database container is ready!"
 
-echo "Initializing database if needed..."
-if [ ! -f /var/lib/postgresql/data/init_completed ]; then
-  /init-db.sh
-  touch /var/lib/postgresql/data/init_completed
-  echo "Database initialized now."
-else
-  echo "Database already initialized, skipping."
-fi
-
 echo "Applying migrations..."
 python manage.py migrate --noinput
 
