@@ -25,8 +25,8 @@ COPY . /code/
 
 # entrypoint.sh, init-db.sh 복사 및 실행 권한 부여
 COPY entrypoint.sh /entrypoint.sh
-COPY init-db.sh /init-db.sh
-RUN chmod +x /entrypoint.sh /init-db.sh
+COPY init-db.sh /docker-entrypoint-initdb.d/init-db.sh
+RUN chmod +x /entrypoint.sh /init-db.sh /docker-entrypoint-initdb.d/init-db.sh
 
 # 포트 노출
 EXPOSE 8000
