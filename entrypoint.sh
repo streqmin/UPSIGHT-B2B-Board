@@ -7,20 +7,22 @@ fi
 
 echo "Waiting for database to be ready..."
 TIMEOUT=60
-while ! pg_isready -h "$DATABASE_HOST" -p "$DATABASE_PORT" -U "postgres"; do
+while ! pg_isready -h "$DATABASE_HOST" -p "$DATABASE_PORT"; do
   sleep 2
   TIMEOUT=$((TIMEOUT - 2))
+  echo "Waiting for database to be ready...$(TIMEOUT)s"
   if [ "$TIMEOUT" -le 0 ]; then
     echo "Database did not become ready in time. Exiting."
     exit 1
   fi
 done
-echo "Database is ready!"
+echo "Database container is ready!"
 
 echo "Initializing database if needed..."
 if [ ! -f /var/lib/postgresql/data/init_completed ]; then
   /init-db.sh
   touch /var/lib/postgresql/data/init_completed
+  echo "Database initialized now."
 else
   echo "Database already initialized, skipping."
 fi
