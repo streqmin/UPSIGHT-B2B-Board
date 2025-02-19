@@ -7,9 +7,9 @@ fi
 
 echo "Waiting for database to be ready..."
 TIMEOUT=60
-while ! pg_isready -h "$DATABASE_HOST" -p "$DATABASE_PORT"; do
-  sleep 2
-  TIMEOUT=$((TIMEOUT - 2))
+while ! pg_isready -h $DATABASE_HOST -p $DATABASE_PORT -U $POSTGRES_USER; do
+  sleep 1
+  TIMEOUT=$((TIMEOUT - 1))
   echo "Waiting for database to be ready...$(TIMEOUT)s"
   if [ "$TIMEOUT" -le 0 ]; then
     echo "Database did not become ready in time. Exiting."
