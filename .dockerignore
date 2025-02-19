@@ -1,0 +1,14 @@
+**/.git*
+**/.idea*
+**/__pycache__*
+**/.pytest_cache*
+**/*.pyc
+**/*.pyo
+**/*.log
+.coverage
+.python-version
+Dockerfile
+docker-compose.yml
+init-db.sh
+reset_docker.sh
+staticfiles/

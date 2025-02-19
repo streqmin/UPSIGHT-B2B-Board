@@ -1,10 +1,22 @@
 #!/bin/sh
 
+# .env 파일 로드
+if [ -f .env ]; then
+  export $(grep -v '^#' .env | xargs)
+fi
+
 echo "Waiting for database to be ready..."
-while ! nc -z db 5432; do
+TIMEOUT=60
+while ! pg_isready -h $DATABASE_HOST -p $DATABASE_PORT -U $POSTGRES_USER; do
   sleep 1
+  TIMEOUT=$((TIMEOUT - 1))
+  echo "Waiting for database to be ready...$(TIMEOUT)s"
+  if [ "$TIMEOUT" -le 0 ]; then
+    echo "Database did not become ready in time. Exiting."
+    exit 1
+  fi
 done
-echo "Database is ready!"
+echo "Database container is ready!"
 
 echo "Applying migrations..."
 python manage.py migrate --noinput
