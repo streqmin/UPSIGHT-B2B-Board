@@ -23,13 +23,8 @@ RUN pip install -r requirements.txt
 # 프로젝트 파일 복사
 COPY . /code/
 
-# entrypoint.sh, init-db.sh 복사 및 실행 권한 부여
-COPY entrypoint.sh /entrypoint.sh
-COPY init-db.sh /docker-entrypoint-initdb.d/init-db.sh
-RUN chmod +x /entrypoint.sh /init-db.sh /docker-entrypoint-initdb.d/init-db.sh
-
 # 포트 노출
 EXPOSE 8000
 
 # 컨테이너 실행 시 entrypoint.sh 실행
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/code/entrypoint.sh"]
