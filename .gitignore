@@ -40,3 +40,7 @@ node_modules/
 
 # coverage
 *.coverage
+
+# all package list before deleted
+packagelist.txt
+alllist.txt

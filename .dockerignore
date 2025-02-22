@@ -12,3 +12,5 @@ docker-compose.yml
 init-db.sh
 reset_docker.sh
 staticfiles/
+packagelist.txt
+alllist.txt
