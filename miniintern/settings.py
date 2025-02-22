@@ -15,7 +15,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    config('EC2'),  # EC2 public IPv4
+    "localhost",
+    "127.0.0.1"
+]
 
 # Application definition
 INSTALLED_APPS = [
@@ -42,6 +46,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'authentication.middlewares.JWTUserMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -111,13 +116,16 @@ SWAGGER_SETTINGS = {
 
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
+CSRF_TRUSTED_ORIGINS = [
+    "http://" + config('EC2'),
+    "https://" + config('EC2')
+]
 
 CORS_ALLOW_CREDENTIALS = True
-
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "http://localhost:8000"
-    # 허용할 도메인 추가
+    "http://localhost:8000",
+    "http://" + config('EC2'),
 ]
 
 from datetime import timedelta
@@ -170,6 +178,9 @@ USE_TZ = True  # 시간대 사용 활성화
 STATIC_URL = '/static/'  # 정적 파일의 URL 경로
 STATICFILES_DIRS = [BASE_DIR / 'static']  # 프로젝트 내에서 정적 파일을 찾는 경로
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# WhiteNoise의 압축 및 캐싱 활성화 (옵션)
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
