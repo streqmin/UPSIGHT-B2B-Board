@@ -15,7 +15,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    config('EC2'),  # EC2 public IPv4
+    "localhost",
+    "127.0.0.1"
+]
 
 # Application definition
 INSTALLED_APPS = [
@@ -112,13 +116,16 @@ SWAGGER_SETTINGS = {
 
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
+CSRF_TRUSTED_ORIGINS = [
+    "http://" + config('EC2'),
+    "https://" + config('EC2')
+]
 
 CORS_ALLOW_CREDENTIALS = True
-
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "http://localhost:8000"
-    # 허용할 도메인 추가
+    "http://localhost:8000",
+    "http://" + config('EC2'),
 ]
 
 from datetime import timedelta
